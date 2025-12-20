@@ -1,0 +1,699 @@
+\chapter{Cơ sở lý thuyết}
+\label{chap:chap1-introduce}
+
+% Tại chương này, tác giả giới thiệu cấu trúc thư mục của dự án, giải thích các cài đặt, một số lưu ý trong quá trình sử dụng. Chương này cũng như báo cáo này không giới thiệu các cú pháp cơ bản như gõ phương trình, tạo bảng đơn giản, chèn hình ảnh.
+
+\section{Tổng quan về Hệ thống phân tán}
+
+% \indent Hình \ref{fig:chap1-project-directory} mô tả cấu trúc thư mục của dự án. Thư mục \textbf{chapters} lưu các thành phần văn bản chính của dự án. Trong thư mục này chia làm ba thư mục, \textbf{\textit{back}} tương ứng với các phụ lục phía sau báo cáo.
+
+% \begin{figure}
+%     \centering
+%     \includegraphics[scale=0.5]{chapter1/chap1-project-directory.png}
+%     \caption{Cấu trúc thư mục của dự án}
+%     \label{fig:chap1-project-directory}
+% \end{figure}
+
+\subsection{ Khái niệm hệ thống phân tán}
+
+Hệ thống phân tán (Distributed System) là tập hợp nhiều máy tính độc lập, được liên kết với nhau thông qua mạng và phối hợp hoạt động như một hệ thống thống nhất. Mặc dù các thành phần được triển khai trên nhiều nút vật lý khác nhau, người dùng và ứng dụng vẫn nhìn thấy chúng như một thực thể duy nhất.
+
+Cốt lõi của hệ thống phân tán nằm ở khả năng phân tán tài nguyên, tính tự trị của từng node và cơ chế phối hợp giữa các thành phần. Những đặc điểm này cho phép hệ thống xử lý hiệu quả các tác vụ lớn mà một máy đơn lẻ không thể đảm nhiệm.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.45]{chapter1/101-Distributed-System.png}
+    \caption{Hệ thống phân tán trong thực tế}
+    \label{fig:chap1-information-variable}
+\end{figure}
+
+% Thư mục \textbf{\textit{front}} tương ứng với các trang thông tin hội đồng chấm tốt nghiệp, lời cảm ơn, danh mục từ viết tắt... Thư mục \textbf{\textit{main}} chứa các chương của báo cáo. Báo cáo đánh số thứ tự riêng cho phần \textit{\textbf{front}}, trong khi phần các chương chính và phần phụ lục được đánh số giống nhau. Báo cáo đánh số trang bắt đầu từ trang tóm tắt, chữ số Ả-rập, bắt đầu bằng 1.
+
+% Thư mục \textbf{\textit{graphics}} chứa hình ảnh được chèn vào báo cáo. Tương ứng với mỗi chương sẽ có 1 thư mục hình ảnh của chương đó.
+
+% Thư mục \textbf{\textit{imgs}} là thư mục chứa hình ảnh của dự án, nó bao gồm các logo, watermark hoặc hình ảnh phục vụ cho document trên github. Hình chèn vào báo cáo không được lưu trong thư mục này.
+
+% Thư mục \textbf{\textit{references}} chứa các file chỉ mục tài liệu tham khảo. Tương tự như mỗi chapter một file .tex, nó cũng có riêng một file .bib để chỉ rõ các tài liệu tham khảo nào được sử dụng trong chuong nào.
+
+% File \textbf{\textit{thesis.cls}} là file quy định các câu lệnh, mức chỉ mục đánh số hình ảnh, bảng biểu, phần, chương. Quy định header và footer, trang  bìa.... Chi tiết xem trong file. Hãy chắc chắn rằng bạn hiểu rõ tất cả nếu muốn thay đổi gì trong file này.
+
+% File \textbf{\textit{thesis.tex}} là file quy định cấu trúc báo cáo, chương nào trước, chương nào sau, quy định thư mục hình ảnh chèn trong báo cáo. Nó quy định thông tin người báo cáo thông qua các câu lệnh được quy định trong file .cls. 
+
+\subsection{Ưu điểm và nhược điểm của hệ thống phân tán}
+
+Hệ thống phân tán được sử dụng phổ biến nhờ khả năng kết hợp tài nguyên từ nhiều máy tính độc lập để xử lý các tác vụ có quy mô lớn. Việc tổ chức hệ thống theo mô hình phân tán mang lại nhiều lợi ích quan trọng, nhưng đồng thời cũng đi kèm các thách thức trong thiết kế, triển khai và vận hành. Phần này trình bày chi tiết các ưu điểm và nhược điểm của hệ thống phân tán.
+
+\textbf{Ưu điểm}
+
+Một trong những ưu điểm nổi bật nhất của hệ thống phân tán là khả năng mở rộng (scalability). Khi nhu cầu xử lý tăng lên, hệ thống có thể dễ dàng bổ sung thêm các node mới mà không làm gián đoạn hoạt động chung. Điều này cho phép phân tán khối lượng công việc, cải thiện hiệu năng và đảm bảo ứng dụng có thể phục vụ lượng người dùng lớn hơn.
+
+Hệ thống phân tán cũng mang lại tính sẵn sàng cao (high availability). Khi một node gặp sự cố, các node khác vẫn có thể tiếp tục hoạt động, giúp hạn chế gián đoạn dịch vụ. Cơ chế này hỗ trợ khả năng chịu lỗi (fault tolerance), cho phép hệ thống tiếp tục vận hành ngay cả khi một phần tử bị hỏng.
+
+Ngoài ra, hệ thống phân tán còn giúp tối ưu truy cập nhờ việc đặt dữ liệu hoặc dịch vụ tại nhiều vị trí khác nhau. Người dùng có thể truy cập tài nguyên thông qua node gần họ nhất, giúp giảm độ trễ và cải thiện trải nghiệm.
+
+Việc phân tán tải cũng loại bỏ tình trạng phụ thuộc vào một máy đơn lẻ, từ đó giúp giảm nguy cơ quá tải, tăng độ ổn định, và tối ưu khai thác tài nguyên tổng thể của hệ thống. Nhờ vậy, mô hình phân tán phù hợp cho các hệ thống lớn, yêu cầu xử lý thời gian thực hoặc phục vụ người dùng đông đảo.
+
+\textbf{Nhược điểm}
+
+Bên cạnh các ưu điểm kể trên, hệ thống phân tán vẫn tồn tại nhiều thách thức đáng kể. Đầu tiên là độ phức tạp trong thiết kế và triển khai. Việc phối hợp nhiều node độc lập đòi hỏi cơ chế truyền thông hiệu quả, các thuật toán phân tán và hệ thống quản lý tập trung hoặc phân tán phù hợp.
+
+Một vấn đề quan trọng khác là đồng bộ dữ liệu (data consistency). Khi dữ liệu được lưu trên nhiều node, việc đảm bảo các bản sao luôn giống nhau là không đơn giản. Các thuật toán đảm bảo nhất quán như consensus hoặc distributed locking tiêu tốn nhiều tài nguyên và có thể làm giảm hiệu năng hệ thống.
+
+Ngoài ra, hệ thống phân tán cũng phải đối mặt với rủi ro bảo mật cao hơn. Dữ liệu và các thành phần của hệ thống phải truyền qua mạng, dẫn đến nguy cơ rò rỉ thông tin hoặc tấn công mạng. Do đó, hệ thống đòi hỏi cơ chế mã hóa, xác thực và kiểm soát truy cập phức tạp hơn so với mô hình tập trung.
+
+Hệ thống phân tán cũng yêu cầu chi phí vận hành và giám sát cao. Việc theo dõi trạng thái của nhiều node, phát hiện lỗi, đánh giá tải và cân bằng tài nguyên là những nhiệm vụ đòi hỏi công cụ quản lý chuyên dụng. Điều này làm tăng độ khó trong bảo trì cũng như mức độ am hiểu kỹ thuật của đội ngũ vận hành.
+
+Nhìn chung, dù mang lại khả năng mở rộng và độ tin cậy vượt trội, hệ thống phân tán yêu cầu sự đầu tư đáng kể vào thiết kế, triển khai và bảo trì. Do đó, người xây dựng hệ thống cần lựa chọn mô hình phù hợp để cân bằng giữa lợi ích và chi phí vận hành.
+
+\clearpage
+
+\section{Orchestration trong hệ thống phân tán}
+
+Trong một hệ thống phân tán hiện đại, số lượng thành phần phần mềm và phần cứng có thể tăng lên đáng kể theo thời gian. Việc vận hành các thành phần này theo cách thủ công không chỉ tốn thời gian mà còn dễ gây ra sai sót. Do đó, cơ chế \textit{orchestration} ra đời nhằm tự động hoá quá trình triển khai, quản lý và điều phối tài nguyên trong toàn bộ hệ thống.
+
+Orchestration được hiểu như một tập hợp các quy trình tự động, đảm nhiệm việc giám sát trạng thái của các dịch vụ, phân bổ tài nguyên hợp lý và đảm bảo các thành phần luôn hoạt động đồng bộ. Trong hệ thống phân tán, nơi mà các node hoạt động độc lập và liên tục thay đổi, orchestration đóng vai trò duy trì tính ổn định và độ tin cậy cho toàn bộ kiến trúc.
+
+Một trong những nhiệm vụ cốt lõi của orchestration là quản lý vòng đời dịch vụ. Điều này bao gồm việc khởi tạo, mở rộng, thu hẹp hoặc thay thế các thành phần ứng dụng tùy theo nhu cầu thực tế. Cơ chế này cho phép hệ thống tự động phản ứng trước sự gia tăng tải, đồng thời giảm thiểu rủi ro gián đoạn khi có sự cố xảy ra.
+
+Ngoài ra, orchestration còn hỗ trợ tối ưu hóa tài nguyên bằng cách phân phối workload một cách hài hòa giữa các node. Nhờ đó, hệ thống tránh được tình trạng quá tải cục bộ, đồng thời đảm bảo chi phí vận hành luôn ở mức hợp lý. Các quy tắc điều phối được thiết lập dựa trên mục tiêu vận hành, chẳng hạn như giảm độ trễ, tăng thông lượng hoặc đảm bảo SLA.
+
+Bên cạnh các chức năng kỹ thuật, orchestration còn góp phần nâng cao tính linh hoạt và khả năng mở rộng của hệ thống. Với cơ chế tự động hoá, đội ngũ vận hành có thể triển khai các bản cập nhật, thay đổi cấu hình hoặc mở rộng hệ thống mà không ảnh hưởng đến dịch vụ đang hoạt động. Điều này giúp rút ngắn thời gian triển khai cũng như giảm thiểu lỗi cấu hình từ con người.
+
+Tóm lại, orchestration giữ vai trò trung tâm trong việc đảm bảo hệ thống phân tán vận hành ổn định, tự chủ và hiệu quả. Nhờ khả năng tự động giám sát, điều chỉnh và phối hợp giữa các thành phần, orchestration trở thành nền tảng quan trọng trong các kiến trúc hiện đại, đặc biệt là trong môi trường microservices và điện toán đám mây.
+
+\clearpage
+\subsection{ Kubernetes }
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{chapter1/102-kubernetes.png}
+    \caption{Kubernetes}
+    \label{fig:chap1-information-variable}
+\end{figure}
+
+Kubernetes là một hệ thống điều phối (\textit{orchestration}) mã nguồn mở được phát triển 
+bởi Google, hiện nay được xem như \textbf{tiêu chuẩn vàng} trong việc quản lý và vận hành 
+các hệ thống phân tán hiện đại. Mục tiêu chính của Kubernetes là cung cấp một nền tảng 
+\textbf{tự động hoá} việc triển khai, mở rộng và quản lý vòng đời của các ứng dụng dạng container.
+
+Kubernetes \textbf{trừu tượng hoá} cơ sở hạ tầng vật lý hoặc đám mây, cho phép ứng dụng 
+được triển khai một cách linh hoạt mà không phụ thuộc vào môi trường chạy bên dưới. 
+Nhờ vậy, các nhóm phát triển có thể tập trung vào \textbf{logic nghiệp vụ} thay vì phải quan tâm 
+đến các vấn đề liên quan đến phần cứng, mạng hay cấu hình thủ công.
+
+Một trong những ưu điểm lớn nhất của Kubernetes là khả năng \textbf{tự phục hồi}.  
+\textit{Self-healing}. Khi một container gặp lỗi hoặc một node trong cluster ngừng hoạt động, Kubernetes sẽ tự động 
+thay thế hoặc di chuyển workload sang node khoẻ mạnh khác để đảm bảo dịch vụ không bị gián đoạn. 
+Hệ thống cũng hỗ trợ \textbf{mở rộng theo tải} (\textit{autoscaling}), giúp phân bổ tài nguyên tối ưu 
+trong các giai đoạn tải tăng cao.
+
+Bên cạnh đó, Kubernetes còn cung cấp các cơ chế mạnh mẽ như \textbf{triển khai cuộn} 
+(\textit{rolling update}), \textbf{triển khai song song} (\textit{blue–green deployment}), phân tách workload 
+bằng \textbf{namespace}, kiểm soát truy cập, và khả năng mở rộng hệ sinh thái thông qua hàng nghìn plugin 
+và công cụ bổ trợ. Chính nhờ khả năng linh hoạt này, Kubernetes được ứng dụng rộng rãi trong các hệ thống 
+\textbf{microservices} và các nền tảng điện toán đám mây như \textbf{AWS}, \textbf{GCP}, \textbf{Azure}.
+
+Tóm lại, Kubernetes đóng vai trò \textbf{nền tảng quan trọng} trong việc bảo đảm tính ổn định, tự chủ 
+và khả năng mở rộng của các hệ thống phân tán hiện đại. Đây là \textbf{công cụ trọng tâm} giúp các doanh nghiệp 
+xây dựng hạ tầng ứng dụng bền vững, tự động hoá sâu và sẵn sàng vận hành ở \textbf{quy mô lớn}.
+
+% 1.2.2 Amazon Elastic Kubernetes ( EKS)
+
+\subsection{Amazon Elastic Kubernetes Service (EKS)}
+
+Amazon Elastic Kubernetes Service (EKS) là một dịch vụ Kubernetes được quản lý hoàn toàn 
+(\textit{fully managed}) do Amazon Web Services (AWS) cung cấp. EKS cho phép các tổ chức triển khai, 
+vận hành và mở rộng các ứng dụng chạy trên Kubernetes mà không cần tự quản lý control plane hay 
+các thành phần hạ tầng phức tạp của cụm Kubernetes.
+
+Một trong những lợi ích lớn nhất của EKS là AWS chịu trách nhiệm vận hành \textbf{control plane}, 
+bao gồm API server, etcd và các cơ chế tự động hoá liên quan đến khả năng mở rộng, bảo mật và cập nhật 
+phiên bản. Điều này giúp giảm đáng kể gánh nặng vận hành cho đội ngũ kỹ thuật, đồng thời đảm bảo 
+hệ thống đạt độ tin cậy cao theo tiêu chuẩn của AWS.  
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.29]{chapter1/103-EKS.png}
+    \caption{Amazon Elastic Kubernetes Service}
+    \label{fig:chap1-information-variable}
+\end{figure}
+
+\subsubsection*{1.2.2.1 Managed control plane}
+
+Control plane của Amazon EKS được triển khai theo mô hình phân tán trên nhiều vùng sẵn sàng 
+(\textit{Availability Zones}). Nhờ cấu trúc này, cụm Kubernetes đạt được khả năng chống chịu lỗi 
+cao hơn đáng kể so với các cụm tự quản lý. Khi một AZ gặp sự cố, các thành phần như 
+API server, \textit{etcd} và các cơ chế đồng bộ dữ liệu vẫn tiếp tục hoạt động ổn định, 
+đảm bảo việc điều phối workload trong cụm không bị gián đoạn.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.59]{chapter1/104-EKS-architecture}
+    \caption{Kiến trúc tích hợp Amazon EKS giữa control plane và hạ tầng người dùng}
+    \label{fig:eks-architecture}
+\end{figure}
+
+\subsubsection*{1.2.2.2 Node management: Self-managed node vs. Managed node group}
+
+Bên cạnh control plane, Amazon EKS cung cấp hai mô hình quản lý node: 
+\textbf{self-managed node} và \textbf{managed node group}.
+
+\begin{itemize}
+    \item \textbf{Self-managed node}: Người dùng tự tạo và cấu hình EC2 instance, tự triển khai 
+    \textit{node bootstrap}, tự quản lý cập nhật phiên bản và tự thay thế node khi xảy ra lỗi. 
+    Mô hình này linh hoạt nhưng yêu cầu chi phí vận hành và kiến thức chuyên sâu.
+
+    \item \textbf{Managed node group}: AWS tự động hoá vòng đời node, bao gồm cập nhật phiên bản 
+    AMI, thay thế node lỗi, mở rộng/thu hẹp số lượng node dựa trên nhu cầu thực tế. 
+    Điều này giúp giảm đáng kể công sức quản trị và đảm bảo sự đồng nhất trong vận hành.
+\end{itemize}
+
+\subsubsection*{Tích hợp với hệ sinh thái AWS}
+
+Một lợi thế quan trọng của Amazon EKS là khả năng tích hợp sâu với các dịch vụ hạ tầng AWS. 
+Các dịch vụ như \textbf{Elastic Load Balancing}, \textbf{IAM}, \textbf{VPC}, \textbf{CloudWatch}, 
+\textbf{ECR} và \textbf{Auto Scaling} đều được hỗ trợ trực tiếp. Nhờ vậy, hệ thống có thể:
+
+\begin{itemize}
+    \item Triển khai an toàn theo chuẩn AWS,
+    \item Theo dõi và giám sát tập trung,
+    \item Tối ưu chi phí và hiệu năng,
+    \item Duy trì đồng nhất trong quản lý và vận hành.
+\end{itemize}
+
+Ngoài ra, EKS hỗ trợ mở rộng linh hoạt cho cả workload và hạ tầng. Việc kết hợp với 
+\textit{Cluster Autoscaler} hoặc các giải pháp hiện đại như \textit{Karpenter} cho phép tự động 
+phân bổ tài nguyên tối ưu trong các giai đoạn biến động tải, đảm bảo hệ thống vận hành hiệu quả 
+và chi phí hợp lý.
+
+\subsubsection*{1.2.2.3 EKS Networking Architecture}
+
+Kiến trúc mạng của Amazon EKS được xây dựng dựa trên nền tảng Amazon VPC, 
+trong đó mỗi \textit{Pod} trong cụm Kubernetes được gán địa chỉ IP trực tiếp từ 
+không gian địa chỉ của VPC. Cách tiếp cận này khác biệt so với nhiều giải pháp 
+Kubernetes truyền thống vốn sử dụng mạng dạng \textit{overlay} như Flannel hoặc 
+Calico. Nhờ sử dụng mô hình \textbf{VPC-native networking}, EKS mang lại các ưu điểm:
+
+\begin{itemize}
+    \item Tối ưu độ trễ mạng do không cần encapsulation,
+    \item Khả năng quan sát (\textit{observability}) cao hơn khi mỗi Pod xuất hiện 
+    như một thành phần riêng trong VPC,
+    \item Tích hợp chặt chẽ với các dịch vụ mạng của AWS như Security Group, Route Table.
+\end{itemize}
+
+Trong EKS, thành phần chịu trách nhiệm cho việc cấp phát và quản lý địa chỉ IP 
+của Pod chính là \textbf{Amazon VPC CNI plugin}. Plugin này vận hành trực tiếp trong 
+mỗi worker node và đảm nhiệm các vai trò:
+
+\begin{itemize}
+    \item Gán IP cho Pod từ các dải địa chỉ của subnet,
+    \item Gắn và quản lý các \textit{Elastic Network Interface} (ENI),
+    \item Cập nhật tuyến đường mạng vào bảng định tuyến của kernel,
+    \item Thiết lập các luật NAT và iptables khi cần thiết.
+\end{itemize}
+
+Sơ đồ \ref{fig:eks-networking} mô tả chi tiết quy trình hoạt động của VPC CNI plugin, 
+bao gồm việc gán ENI, phân bổ IP cho Pod và truyền tải lưu lượng trong node.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.11]{chapter1/106-EKS-Networking}
+    \caption{Kiến trúc mạng Amazon EKS với Amazon VPC CNI plugin}
+    \label{fig:eks-networking}
+\end{figure}
+
+\paragraph*{Cơ chế cấp phát địa chỉ IP}
+
+Mỗi worker node được gắn một hoặc nhiều ENI. Mỗi ENI chứa một tập địa chỉ IP thứ cấp. 
+Amazon VPC CNI plugin sử dụng thành phần \textbf{L-IPAM daemon} để lấy IP từ subnet và 
+lưu trữ vào bộ đệm cục bộ. Khi một Pod mới được tạo, plugin cấp phát IP trực tiếp từ 
+bộ đệm này, đảm bảo quá trình tạo Pod diễn ra nhanh và không phụ thuộc hoàn toàn vào API của AWS.
+
+Điều này đồng thời giải thích vì sao số lượng Pod trên mỗi node trong EKS bị giới hạn 
+bởi số lượng ENI và số lượng IP mà ENI hỗ trợ. AWS cung cấp bảng giới hạn cụ thể tùy 
+theo loại EC2 instance (ví dụ: \texttt{t3.medium} tối đa 17 Pod, \texttt{m5.large} tối đa 29 Pod).
+
+\paragraph*{Luồng định tuyến và xử lý gói tin}
+
+Dựa vào sơ đồ trên, có thể tóm tắt quá trình xử lý mạng trong EKS như sau:
+
+\begin{enumerate}
+    \item Khi Pod tạo mới, VPC CNI gán IP từ ENI tương ứng.
+    \item Kernel API của hệ điều hành được cập nhật để thêm tuyến mạng cho Pod.
+    \item Lưu lượng từ Pod đi ra ngoài node được chuyển qua ENI tương ứng và đi vào VPC.
+    \item Nếu Pod được gán trên nhiều ENI khác nhau, iptables sẽ hướng tuyến phù hợp.
+    \item API server và kubelet giao tiếp qua X-ENI do EKS control plane tạo và quản lý.
+\end{enumerate}
+
+\paragraph*{Ưu điểm của kiến trúc mạng VPC-native}
+
+\begin{itemize}
+    \item \textbf{Hiệu năng cao}: không sử dụng encapsulation như VXLAN.
+    \item \textbf{Bảo mật chặt chẽ}: áp dụng Security Group trực tiếp lên ENI.
+    \item \textbf{Tích hợp sâu với dịch vụ AWS}: CloudWatch, VPC Flow Logs, ELB.
+    \item \textbf{Độ ổn định cao}: ít thành phần trung gian hơn so với overlay networking.
+\end{itemize}
+
+\paragraph*{Hạn chế và cách khắc phục}
+
+Mặc dù hiệu quả, VPC CNI vẫn tồn tại một số hạn chế:
+
+\begin{itemize}
+    \item số lượng Pod phụ thuộc vào giới hạn ENI,
+    \item tiêu thụ nhiều IP của subnet khi chạy nhiều Pod,
+    \item khó mở rộng nếu không thiết kế subnet đủ lớn.
+\end{itemize}
+
+AWS cung cấp giải pháp \textbf{Prefix Delegation} để tăng số lượng Pod trên node, 
+giúp giảm áp lực tiêu thụ IP và tăng hiệu quả vận hành.
+
+\clearpage
+
+% 1.2.2.4 Load Balancing trong EKS
+
+\subsubsection*{1.2.2.4 Load Balancing trong Amazon EKS}
+
+Cơ chế cân bằng tải là thành phần quan trọng trong việc phân phối lưu lượng 
+đến các ứng dụng microservices chạy trên Amazon EKS. Trong EKS, hai loại 
+Load Balancer được sử dụng phổ biến nhất là \textit{Application Load Balancer} (ALB) 
+và \textit{Network Load Balancer} (NLB). Phần này tập trung trình bày kiến trúc và 
+cơ chế hoạt động của ALB trong môi trường EKS.
+
+\paragraph*{Application Load Balancer (ALB)}
+
+Application Load Balancer là bộ cân bằng tải lớp 7 (HTTP/HTTPS), được thiết kế 
+tối ưu cho các ứng dụng web, API và hệ thống microservices có yêu cầu định tuyến 
+phức tạp. Trong EKS, ALB được quản lý bởi \textbf{AWS Load Balancer Controller}, 
+thành phần đảm nhiệm việc tự động tạo, cập nhật và xoá Load Balancer dựa trên 
+các tài nguyên Kubernetes như Ingress hoặc Service.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.36]{chapter1/107-ALB-EKS}
+    \caption{Cơ chế phân phối lưu lượng của Application Load Balancer trong Amazon EKS}
+    \label{fig:alb-eks}
+\end{figure}
+
+\paragraph*{Cơ chế hoạt động}
+
+Dựa theo sơ đồ \ref{fig:alb-eks}, quá trình phân phối lưu lượng của ALB trong EKS diễn ra như sau:
+
+\begin{enumerate}
+    \item Người dùng gửi yêu cầu HTTP/HTTPS đến địa chỉ của ALB.
+    \item ALB tiếp nhận lưu lượng và áp dụng các quy tắc định tuyến (host-based routing, path-based routing).
+    \item AWS Load Balancer Controller ánh xạ các quy tắc Ingress với các \textit{target group} tương ứng.
+    \item ALB chuyển lưu lượng đến các Pod trong target group thông qua chế độ \textit{IP target mode}, 
+    trong đó mỗi Pod được đăng ký trực tiếp bằng địa chỉ IP.
+    \item Các Pod thuộc nhiều service khác nhau (ví dụ: \texttt{MyApp}, \texttt{App2}) được định tuyến 
+    độc lập mà không ảnh hưởng lẫn nhau.
+\end{enumerate}
+
+\paragraph*{Ưu điểm của ALB trong EKS}
+
+\begin{itemize}
+    \item \textbf{Định tuyến lớp 7 linh hoạt}: hỗ trợ phân tách lưu lượng theo path hoặc tên miền.
+    \item \textbf{Tối ưu cho microservices}: cho phép nhiều ứng dụng chia sẻ cùng một ALB.
+    \item \textbf{Tích hợp sâu với AWS}: hỗ trợ HTTPS termination, AWS WAF, CloudWatch metrics.
+    \item \textbf{Tự động hoá}: AWS Load Balancer Controller quản lý toàn bộ vòng đời ALB.
+    \item \textbf{Khả năng mở rộng cao}: ALB tự động scale theo lượng truy cập.
+\end{itemize}
+
+\paragraph*{Khi nào nên sử dụng ALB?}
+
+ALB phù hợp cho các hệ thống:
+
+\begin{itemize}
+    \item Ứng dụng web hoặc API dựa trên HTTP/HTTPS,
+    \item Hệ thống microservices cần định tuyến nâng cao,
+    \item Nhiều dịch vụ chạy chung một domain,
+    \item Yêu cầu xử lý SSL hoặc tích hợp AWS WAF để tăng cường bảo mật.
+\end{itemize}
+
+% 1.2.3 K0s
+
+\subsection*{1.2.3 K0s}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.6]{chapter1/108-k0s}
+    \caption{K0s}
+    \label{fig:eks-networking}
+\end{figure}
+
+K0s là một bản phân phối Kubernetes mã nguồn mở được phát triển bởi công ty Mirantis, 
+hướng đến mục tiêu cung cấp một nền tảng Kubernetes ``tối giản'' (minimal), dễ cài đặt, 
+dễ vận hành và phù hợp cho nhiều môi trường triển khai khác nhau, từ máy ảo, máy vật lý, 
+thiết bị IoT cho đến các cụm Kubernetes quy mô lớn trong doanh nghiệp.  
+
+Không giống như các bản phân phối Kubernetes truyền thống yêu cầu nhiều gói phụ thuộc 
+và quy trình thiết lập phức tạp, k0s được đóng gói dưới dạng một tệp nhị phân duy nhất 
+(\textbf{single binary}), có thể chạy trên bất kỳ hệ điều hành Linux nào mà không cần 
+cài đặt thêm ngữ cảnh container hay runtime đặc thù. Điều này giúp k0s trở thành một lựa chọn 
+nhẹ, linh hoạt và phù hợp cho các môi trường thí nghiệm, thử nghiệm hoặc các hệ thống cần 
+khởi tạo nhanh.
+
+\subsubsection*{Kiến trúc k0s}
+
+Mặc dù được đóng gói đơn giản, k0s vẫn cung cấp đầy đủ các thành phần cốt lõi của một cụm 
+Kubernetes tiêu chuẩn:
+
+\begin{itemize}
+    \item \textbf{Control Plane}: bao gồm API Server, Controller Manager và Scheduler, 
+    được tích hợp trong cùng một tiến trình nhưng vẫn tuân thủ chuẩn Kubernetes.
+    \item \textbf{Datastore}: hỗ trợ cả \textit{etcd} tích hợp hoặc sử dụng backend SQL (MySQL, PostgreSQL) 
+    thông qua mô hình \textit{Kine}, giúp dễ dàng triển khai trong môi trường có sẵn cơ sở dữ liệu.
+    \item \textbf{Worker Node}: sử dụng containerd làm container runtime, kèm theo Kubelet và 
+    các thành phần quản lý mạng.
+    \item \textbf{Networking}: k0s tích hợp sẵn Kube-router hoặc Calico, dễ dàng cấu hình tuỳ theo nhu cầu.
+\end{itemize}
+
+Một điểm quan trọng trong kiến trúc của k0s là mô hình \textbf{tách biệt control plane và worker plane}, 
+giúp cài đặt cụm linh hoạt: control plane có thể chạy trên các node riêng, hoặc toàn bộ cụm có thể chạy 
+tất cả thành phần trong một node duy nhất phục vụ môi trường phát triển.
+
+\subsubsection*{Đặc điểm nổi bật của k0s}
+
+K0s được thiết kế để giảm thiểu độ phức tạp trong vận hành Kubernetes thông qua:
+
+\begin{itemize}
+    \item \textbf{Single binary}: toàn bộ cụm chạy chỉ với một file thực thi duy nhất.
+    \item \textbf{Không phụ thuộc hệ thống}: không yêu cầu Docker, không cần cài kubeadm hoặc kubelet thủ công.
+    \item \textbf{Cài đặt đơn giản}: có thể triển khai thông qua systemd, SSH hoặc dùng k0sctl để tự động hoá.
+    \item \textbf{Tối ưu cho edge computing}: dung lượng nhỏ, chạy tốt trên thiết bị tài nguyên hạn chế.
+    \item \textbf{Tuân thủ chuẩn Kubernetes upstream}: bảo đảm tương thích với API Kubernetes chính thống.
+\end{itemize}
+
+\subsubsection*{So sánh nhanh giữa k0s và K3s}
+
+K0s và K3s đều hướng tới việc đơn giản hóa Kubernetes, tuy nhiên chúng có một số khác biệt:
+
+\begin{itemize}
+    \item \textbf{K0s không patch Kubernetes}: cung cấp trải nghiệm chuẩn upstream 100\%,
+    trong khi K3s áp dụng một số tinh chỉnh để tối ưu.
+    \item \textbf{Hệ thống networking linh hoạt hơn}: hỗ trợ nhiều backend và cho phép 
+    tách biệt datastore thông qua Kine.
+    \item \textbf{Tối ưu cho mô hình hybrid/edge}: do không phụ thuộc hệ thống và rất nhẹ.
+\end{itemize}
+
+\subsubsection*{Ứng dụng của k0s trong bối cảnh luận văn}
+
+Trong khuôn khổ đồ án này, k0s được sử dụng như một nền tảng triển khai thử nghiệm (\textit{staging}) 
+để mô phỏng cách thức hoạt động của Kubernetes và kiểm thử các thành phần như networking, load balancing, hay hệ thống quan sát (Observability) trước khi triển khai chính thức lên môi trường Amazon EKS.  
+
+Cách tiếp cận này mang lại lợi ích:
+
+\begin{itemize}
+    \item Giảm chi phí vận hành do không cần sử dụng tài nguyên đám mây liên tục,
+    \item Dễ dàng tái tạo môi trường thử nghiệm,
+    \item Hỗ trợ kiểm thử nhanh các cấu hình như Autoscaling, Pod scheduling, HPA hoặc Chaos testing,
+    \item Giúp sinh viên hiểu sâu bản chất hoạt động của Kubernetes trước khi tiếp cận EKS.
+\end{itemize}
+
+Tóm lại, k0s là một bản phân phối Kubernetes tối giản nhưng mạnh mẽ, phù hợp cho cả mục tiêu giáo dục, 
+nghiên cứu lẫn triển khai thực tế trong môi trường edge hoặc hybrid.
+
+\clearpage
+
+% 1.3 Monitoring
+
+\section{Monitoring trong hệ thống phân tán}
+
+Trong các hệ thống phân tán và kiến trúc microservices, việc giám sát 
+(\textit{monitoring}) đóng vai trò then chốt giúp đảm bảo tính ổn định, 
+khả năng mở rộng và khả năng phản ứng trước sự cố. Monitoring không chỉ cung cấp 
+các chỉ số hoạt động của hệ thống mà còn giúp phát hiện bất thường, theo dõi 
+hiệu năng và hỗ trợ quá trình phân tích sau sự cố (\textit{post-mortem analysis}).  
+Một trong những công cụ giám sát phổ biến và tiêu chuẩn trong hệ sinh thái 
+cloud–native là Prometheus.
+
+\subsection{Prometheus}
+
+Prometheus là hệ thống giám sát (\textit{monitoring system}) và thu thập dữ liệu 
+(\textit{time-series database}) mã nguồn mở, được phát triển bởi SoundCloud 
+và hiện là một phần của Cloud Native Computing Foundation (CNCF). Nhờ khả năng 
+tích hợp sâu với Kubernetes và cơ chế thu thập dữ liệu linh hoạt, Prometheus được 
+sử dụng rộng rãi trong các hệ thống microservices và môi trường cloud–native.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.15]{chapter1/109-Prometheus_icon}
+    \caption{Prometheus}
+    \label{fig:eks-networking}
+\end{figure}
+
+\subsubsection{Khái niệm}
+
+Prometheus hoạt động dựa trên mô hình lưu trữ chuỗi thời gian (\textit{time-series}), 
+trong đó dữ liệu được thu thập định kỳ từ các thành phần của hệ thống thông qua 
+cơ chế \textbf{pull}, tức Prometheus chủ động truy vấn đến các mục tiêu giám sát 
+(\textit{targets}) để lấy dữ liệu. Mỗi dữ liệu được lưu trữ dưới dạng 
+\textit{metric} và được gắn kèm nhãn (\textit{labels}) giúp dễ dàng phân loại, 
+lọc và truy vấn.
+
+Các thành phần chính trong mô hình của Prometheus gồm:
+
+\begin{itemize}
+    \item \textbf{Prometheus Server}: chịu trách nhiệm thu thập, lưu trữ và xử lý dữ liệu.
+    \item \textbf{Exporters}: các thành phần cung cấp dữ liệu metric, ví dụ Node Exporter, cAdvisor.
+    \item \textbf{PromQL}: ngôn ngữ truy vấn mạnh mẽ giúp phân tích chuỗi thời gian.
+    \item \textbf{Alertmanager}: xử lý cảnh báo dựa trên các quy tắc (\textit{alerting rules}).
+\end{itemize}
+
+Nhờ kiến trúc đơn giản nhưng linh hoạt, Prometheus được xem là tiêu chuẩn 
+giám sát mặc định trong các hệ thống sử dụng Kubernetes và là thành phần cốt lõi 
+của các giải pháp quan sát toàn diện (\textit{observability stack}) như 
+Prometheus–Grafana–Alertmanager.
+
+\subsubsection{Kiến trúc Prometheus}
+
+Kiến trúc của Prometheus được thiết kế theo mô hình đơn giản, độc lập và dễ mở rộng, 
+cho phép hệ thống giám sát hoạt động ổn định ngay cả trong các môi trường phân tán 
+như Kubernetes. Prometheus sử dụng cơ chế thu thập dữ liệu dạng \textit{pull} và 
+lưu trữ vào cơ sở dữ liệu chuỗi thời gian (\textit{Time-Series Database} – TSDB).
+
+Sơ đồ \ref{fig:prom-architecture} mô tả tổng quan các thành phần chính trong kiến trúc Prometheus.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{chapter1/110-Prometheus-architecture}
+    \caption{Kiến trúc tổng quan của hệ thống Prometheus}
+    \label{fig:prom-architecture}
+\end{figure}
+
+\paragraph*{Prometheus Server}  
+Đây là thành phần trung tâm của hệ thống, bao gồm các module chính:
+
+\begin{itemize}
+    \item \textbf{Retrieval}: định kỳ truy vấn (scrape) dữ liệu từ các targets như Exporter, ứng dụng, node.
+    \item \textbf{TSDB}: lưu trữ dữ liệu chuỗi thời gian trên ổ đĩa cục bộ của node chạy Prometheus.
+    \item \textbf{HTTP Server}: cung cấp API cho PromQL, giao diện Web UI và các công cụ khác.
+\end{itemize}
+
+\paragraph*{Service Discovery}  
+Prometheus tích hợp cơ chế khám phá dịch vụ tự động. Trong Kubernetes, Prometheus có thể tự động 
+nhận diện các \textit{Pod}, \textit{Node} hoặc \textit{Service} thông qua nhãn 
+(\textit{labels}) mà không cần cấu hình thủ công.  
+Điều này giúp hệ thống hoạt động linh hoạt trong môi trường có tính biến động cao.
+
+\paragraph*{Prometheus Targets và Exporters}  
+Các mục tiêu giám sát (\textit{targets}) cung cấp dữ liệu metric thông qua endpoint dạng 
+\texttt{/metrics}. Các exporter phổ biến gồm:
+
+\begin{itemize}
+    \item \textbf{Node Exporter}: thu thập dữ liệu hệ thống (CPU, RAM, Disk, Network).
+    \item \textbf{cAdvisor}: giám sát container.
+    \item \textbf{Kube-State-Metrics}: thu thập trạng thái các tài nguyên Kubernetes.
+\end{itemize}
+
+\paragraph*{Pushgateway}  
+Prometheus chủ yếu sử dụng mô hình \textit{pull}, tuy nhiên với các \textit{short-lived jobs} 
+(kết thúc nhanh) hệ thống cung cấp \textbf{Pushgateway} cho phép gửi dữ liệu theo mô hình \textit{push}.  
+Pushgateway không lưu dữ liệu lâu dài mà chỉ đóng vai trò trung gian trước khi Prometheus thu thập.
+
+\paragraph*{Alertmanager}  
+Là thành phần xử lý cảnh báo, chịu trách nhiệm:
+
+\begin{itemize}
+    \item nhận cảnh báo từ Prometheus Server,
+    \item nhóm và phân loại cảnh báo,
+    \item gửi thông báo qua Email, Slack, Webhook, PagerDuty.
+\end{itemize}
+
+\paragraph*{PromQL và Visualization}  
+Ngôn ngữ truy vấn \textbf{PromQL} giúp phân tích dữ liệu chuỗi thời gian mạnh mẽ và linh hoạt.  
+Kết hợp với các công cụ như:
+
+\begin{itemize}
+    \item \textbf{Prometheus Web UI},
+    \item \textbf{Grafana},
+    \item \textbf{API clients},
+\end{itemize}
+
+Prometheus cho phép trực quan hóa dữ liệu theo thời gian thực và tạo dashboard phục vụ giám sát, cảnh báo.
+
+\paragraph*{Tổng kết}  
+Nhờ kiến trúc module hóa, đơn giản nhưng mạnh mẽ, Prometheus trở thành tiêu chuẩn giám sát 
+mặc định trong hệ sinh thái cloud–native và là thành phần quan trọng trong nhiều hệ thống quan sát 
+(\textit{observability stack}) hiện nay.
+
+\subsection{Grafana Loki}
+
+Trong hệ thống giám sát hiện đại, bên cạnh việc thu thập và phân tích \textit{metrics}, 
+việc ghi nhận và xử lý \textit{logs} cũng là một thành phần quan trọng giúp đánh giá tình trạng 
+hoạt động của hệ thống. Nếu Prometheus đóng vai trò giám sát chỉ số hoạt động, thì Loki là 
+giải pháp được thiết kế nhằm thu thập, lưu trữ và truy vấn log một cách hiệu quả, đặc biệt 
+phù hợp với môi trường Kubernetes và các ứng dụng microservices.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.3]{chapter1/111_Grafana_loki_logo}
+    \caption{Grafana Loki}
+\end{figure}
+
+\subsubsection{Khái niệm}
+
+Grafana Loki là một hệ thống quản lý log được phát triển bởi Grafana Labs, 
+hướng tới mục tiêu cung cấp giải pháp lưu trữ log đơn giản, tiết kiệm chi phí và 
+dễ dàng tích hợp với bộ công cụ giám sát như Prometheus và Grafana.  
+
+Không giống các hệ thống tìm kiếm log truyền thống như Elasticsearch khi đánh chỉ mục 
+toàn bộ nội dung log, Loki chỉ đánh chỉ mục dựa trên \textit{labels}, giúp giảm 
+đáng kể dung lượng lưu trữ và tối ưu chi phí vận hành.
+
+Loki được thiết kế theo mô hình tương tự Prometheus, sử dụng cấu trúc chuỗi thời gian 
+(time-series) để lưu trữ log, cho phép truy vấn bằng ngôn ngữ \textbf{LogQL}, hỗ trợ 
+lọc theo nhãn và nội dung log. Nhờ đặc điểm này, Loki phù hợp trong các môi trường 
+cloud–native có số lượng log lớn, yêu cầu khả năng mở rộng linh hoạt và dễ vận hành.
+
+\paragraph*{Đặc điểm nổi bật của Loki}
+
+\begin{itemize}
+    \item \textbf{Chi phí thấp}: chỉ đánh chỉ mục labels thay vì toàn bộ nội dung log.
+    \item \textbf{Tối ưu cho Kubernetes}: tự động gán nhãn dựa trên metadata như 
+    Pod, Namespace, Container.
+    \item \textbf{Tích hợp chặt chẽ với Grafana}: cho phép xem log song song với metrics.
+    \item \textbf{Dễ triển khai và vận hành}: kiến trúc đơn giản, không cần cụm tìm kiếm phức tạp.
+    \item \textbf{Hỗ trợ LogQL}: cung cấp khả năng truy vấn mạnh mẽ, tương tự PromQL.
+\end{itemize}
+
+\paragraph*{Các thành phần chính của Loki}
+
+\begin{itemize}
+    \item \textbf{Promtail}: thu thập log từ node hoặc container và gửi về Loki.
+    \item \textbf{Loki server}: lưu trữ log dưới dạng các khối nén (\textit{chunks}) và xử lý truy vấn.
+    \item \textbf{LogQL}: ngôn ngữ truy vấn log linh hoạt hỗ trợ lọc theo nhãn và nội dung.
+    \item \textbf{Grafana}: giao diện trực quan hoá log, hỗ trợ phân tích sự cố nhanh chóng.
+\end{itemize}
+
+\subsubsection{Kiến trúc Grafana Loki}
+
+Kiến trúc của Grafana Loki được thiết kế theo mô hình phân tán, tối ưu cho việc thu thập 
+và truy vấn log trong môi trường cloud–native. Không giống như các hệ thống logging sử dụng 
+cơ chế đánh chỉ mục toàn bộ nội dung, Loki chỉ đánh chỉ mục dựa trên \textit{labels}, từ đó 
+giảm chi phí lưu trữ và tăng khả năng mở rộng. Hình \ref{fig:loki-architecture} mô tả kiến trúc 
+tổng quan của Loki, bao gồm các luồng ghi (write path) và luồng đọc (read path).
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.45]{chapter1/112-Grafana_loki_architecture}
+    \caption{Hình 1.10: Kiến trúc tổng quan của Grafana Loki}
+    \label{fig:loki-architecture}
+\end{figure}
+
+\paragraph*{Luồng ghi (Write Path)}
+
+Trong quá trình ghi dữ liệu log, các thành phần sau tham gia xử lý:
+
+\begin{itemize}
+    \item \textbf{Distributor}: nhận log từ các agent như Promtail, Loki Agent hoặc Fluent Bit. 
+    Distributor chịu trách nhiệm phân phối log đến các Ingester dựa trên cơ chế phân mảnh (\textit{sharding}).
+
+    \item \textbf{Ingester}: lưu trữ tạm thời log trong bộ nhớ và chuyển đổi chúng thành các \textit{chunks}. 
+    Các chunks này sau đó được ghi xuống bộ nhớ lâu dài như S3, GCS hoặc MinIO. Ingester đảm bảo 
+    tính nhất quán dữ liệu trước khi hoàn tất quá trình ghi.
+
+    \item \textbf{Index Store}: lưu trữ phần chỉ mục được xây dựng dựa trên labels, giúp tăng tốc quá trình 
+    truy vấn sau này mà không cần đánh chỉ mục toàn bộ nội dung log.
+\end{itemize}
+
+\paragraph*{Luồng đọc (Read Path)}
+
+Khi người dùng thực hiện truy vấn bằng LogQL, Loki xử lý theo các bước:
+
+\begin{itemize}
+    \item \textbf{Query Frontend}: tiếp nhận truy vấn, thực hiện tối ưu hóa và chia nhỏ truy vấn thành nhiều 
+    đoạn nhằm tăng hiệu năng.
+
+    \item \textbf{Querier}: truy xuất dữ liệu log dựa trên labels trong Index Store, sau đó đọc các chunks tương ứng 
+    từ object store. Querier kết hợp và sắp xếp dữ liệu để trả kết quả cuối cùng.
+
+    \item \textbf{Memcache}: được sử dụng trong quá trình đọc nhằm tăng tốc độ truy vấn nhờ lưu trữ các phần tử 
+    indices, chunks hoặc kết quả truy vấn tạm thời.
+\end{itemize}
+
+\paragraph*{Các dịch vụ hỗ trợ}
+
+\begin{itemize}
+    \item \textbf{Ruler}: xử lý các quy tắc cảnh báo dựa trên LogQL, tương tự Alertmanager trong hệ thống Prometheus.
+    \item \textbf{Compactor}: tối ưu dữ liệu lưu trữ bằng cách gộp các chunks nhỏ thành các đơn vị lớn hơn, 
+    giảm chi phí lưu trữ và tăng hiệu năng truy vấn.
+    \item \textbf{Consul/Etcd}: cung cấp dịch vụ quản lý cấu hình và điều phối trong các hệ thống Loki phân tán.
+\end{itemize}
+
+Nhờ kiến trúc phân tán, dễ mở rộng và chi phí vận hành thấp, Loki trở thành giải pháp logging 
+được ưa chuộng trong các hệ thống microservices và môi trường Kubernetes.
+
+\clearpage
+
+\section{Infrastructure as Code (IaC)}
+
+Infrastructure as Code (IaC), hay cơ sở hạ tầng dưới dạng mã là phương pháp quản lý và cung cấp hạ tầng thông qua 
+các tệp cấu hình có thể phiên bản hoá, thay vì thao tác thủ công trên giao diện quản trị. 
+IaC giúp tự động hoá quá trình triển khai, giảm lỗi con người, tăng khả năng tái lập và 
+hỗ trợ mở rộng hạ tầng một cách linh hoạt trong các hệ thống phân tán hoặc môi trường 
+cloud–native.
+
+Một trong những công cụ IaC phổ biến và mạnh mẽ nhất hiện nay là Terraform.
+
+\subsection{Terraform}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=1.5]{chapter1/141-Terraform}
+    \caption{Terraform}
+\end{figure}
+
+Terraform là công cụ IaC do HashiCorp phát triển, cho phép định nghĩa, triển khai và 
+quản lý hạ tầng trên nhiều nhà cung cấp dịch vụ (multi–cloud) thông qua các tệp cấu 
+hình sử dụng ngôn ngữ HashiCorp Configuration Language (HCL). Terraform hỗ trợ quản lý 
+hàng trăm dịch vụ từ AWS, Azure, GCP cho đến các nền tảng Kubernetes, GitHub, 
+Cloudflare và nhiều công cụ DevOps khác.
+
+Điểm mạnh của Terraform nằm ở khả năng mô tả hạ tầng dưới dạng mã nguồn (\textit{infrastructure as code}), 
+tự động tạo kế hoạch thay đổi (\textit{execution plan}) và quản lý trạng thái triển khai 
+thông qua tệp \texttt{terraform.tfstate}. Điều này giúp toàn bộ hạ tầng được triển khai 
+một cách nhất quán, có thể kiểm soát phiên bản và dễ dàng mở rộng.
+
+\begin{itemize}
+    \item \textbf{Ngôn ngữ HCL}: dễ đọc, dễ viết, mô tả tài nguyên dưới dạng cấu hình.
+    \item \textbf{State Management}: theo dõi trạng thái hạ tầng để áp dụng các thay đổi tối ưu.
+    \item \textbf{Plan \& Apply}: cho phép xem trước các thay đổi trước khi áp dụng.
+    \item \textbf{Module hoá}: hỗ trợ tái sử dụng cấu hình và chuẩn hoá kiến trúc triển khai.
+    \item \textbf{Multi–cloud}: quản lý đồng thời nhiều nền tảng hạ tầng khác nhau.
+\end{itemize}
+
+Terraform trở thành lựa chọn phổ biến trong các dự án microservices và hệ thống phân tán 
+nhờ khả năng tự động hoá, đảm bảo tính nhất quán và hỗ trợ quản lý toàn bộ vòng đời hạ tầng 
+từ phát triển, kiểm thử đến vận hành.
+
+% Hai bìa của luận văn được tự động tạo bởi latex. Vì vậy, có các biến được quy định để đảm nhiệm nó. Các biến cần thay đổi được đặt tại thư mục gốc, tập tin \textit{thesis.tex}, được thể hiện trong hình \ref{fig:chap1-information-variable}.
+
+% \begin{figure}
+%     \centering
+%     \includegraphics[scale=0.7]{chapter1/chap1-information-variable.png}
+%     \caption{Phần thay đổi thông tin trang bìa}
+%     \label{fig:chap1-information-variable}
+% \end{figure}
+
+% Các phần tiếp theo, quy định các nội dung được thêm vào báo cáo chính. Nếu một tập tin xuất hiện trong thư mục chapters nhưng không được khai báo bằng lệnh \textit{include} thì cũng không xuất hiện trong báo cáo. Vậy nên các chương mới bắt buộc phải được khai báo trong \textit{thesis.tex}. Các phần tài liêu tham khảo cũng được hiểu tương tự.
+

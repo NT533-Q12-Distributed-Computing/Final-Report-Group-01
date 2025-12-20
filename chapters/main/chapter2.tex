@@ -1,0 +1,269 @@
+% \chapter{Hiện thực đề tài}
+% \label{chap:chap2-figures}
+% Trong một luận văn hay báo cáo, các hình ảnh được sử dụng rất nhiều. Việc chèn hình ảnh tuy đơn giản nhưng cần sử dụng nhiều kỹ thuật. Chương này trình bày các cách chèn hình ảnh từ đơn giản tới phức tạp.
+
+% % \section{Chèn hình ảnh đơn điệu}
+
+% % Chèn hình ảnh đơn điệu nghĩa là chỉ chèn một hình ảnh cơ bản, có cú pháp latex như sau:
+
+% % \begin{lstlisting}[language={[LaTeX]TeX}, caption={Chèn một hình ảnh vào báo cáo}, label={lst:figure}]
+% % \begin{figure}
+% %     \centering
+% %     \includegraphics[scale=0.7]{chapter1/figure-url.png}
+% %     \caption{Caption of figure}
+% %     \label{fig:figure-label}
+% % \end{figure}
+% % \end{lstlisting}
+
+% % Hình ảnh từ đường dẫn \textit{chapter1/figure-url.png} sẽ được chèn vào báo cáo với kích thuớc bằng \textit{scale=0.7}. Hình ảnh sẽ có chú tích là \textit{Caption of figure}, nhãn \textit{fig:figure-label} sẽ được sử dụng để chỉ mục tới hình ảnh.
+
+% % \section{Chèn nhiều hình ảnh trong một hình ảnh}
+
+% % Trong tình huống cần chèn nhiều hình ảnh nhưng bản thân những hình ảnh này có tương quan đến nhau. Ví dụ tại hình \ref{fig:chap2-subfigure-example}, hai hình ảnh thể hiện trạng thái của đối tượng trong các ngữ cảnh khác nhau. Đây là lúc chúng ta cần sử dụng hình ảnh con.
+
+% % Một hinh ảnh với nhiều hình ảnh con được chèn vào báo cáo như sau \cite{ShantoLatex}:
+
+% % \begin{lstlisting}[language={[LaTeX]TeX}, caption={Chèn nhiều hình ảnh con trong một hình ảnh}, label={lst:example-subfigure}]
+% % \begin{figure}
+% %     \begin{subfigure}{0.5\textwidth}
+% %         \centering
+% %         \includegraphics[scale=0.3]{chapter1/subfigure-example.png}
+% %         \caption{Caption of figure 1}
+% %         \label{fig:sub-figure-url-1}
+% %     \end{subfigure}
+% %     \begin{subfigure}{0.5\textwidth}
+% %         \centering
+% %         \includegraphics[scale=0.3]{chapter1/subfigure-example.png}
+% %         \caption{Caption of figure 2}
+% %         \label{fig:sub-figure-url-2}
+% %     \end{subfigure}
+% %     \caption{Caption of figure}
+% %     \label{fig:example-subfigure}
+% % \end{figure}
+      
+% % \end{lstlisting}
+
+% % Một lưu ý khi sử dụng hình ảnh con thì các hình ảnh nên có kích thước giống nhau để đạt độ hiệu quả cao nhất.
+
+% % \begin{figure}
+% %     \begin{subfigure}{0.5\textwidth}
+% %         \centering
+% %         \includegraphics[scale=0.3]{chapter2/chap2-subfigure-example.png}
+% %         \caption{Caption of figure 1}
+% %         \label{fig:chap2-subfigure-example-1}
+% %     \end{subfigure}%
+% %     \begin{subfigure}{0.5\textwidth}
+% %         \centering
+% %         \includegraphics[scale=0.3]{chapter2/chap2-subfigure-example.png}
+% %         \caption{Caption of figure 2}
+% %         \label{fig:chap2-subfigure-example-2}
+% %     \end{subfigure}
+% %     \caption{Mô tả chèn hình ảnh con trong một hình ảnh lớn}
+% %     \label{fig:chap2-subfigure-example}
+% % \end{figure}
+
+% % \section{Chèn hình ảnh với ghi chú ở bên cạnh}
+
+% % Chèn hình ảnh toàn trang thì tương đối dễ, ta chỉ việc chèn hình đó với độ thu phóng phù hợp. Phần này trình bày việc chèn các hình ảnh toàn trang và có ghi chú nằm ở vị trí khác so với bình thường.
+
+% % Hình \ref{fig:img-caption-rotate} minh họa hình ảnh và ghi chú của nó được xoay một góc $90^{\circ}$. Đoạn mã \ref{lst:figure-with-caption-rotate} giúp ta làm được điều này.
+
+% % \begin{figure}
+% %     \begin{minipage}[c]{0.8\textwidth}
+% %       \centering
+% %       \includegraphics[width=\textwidth]{chapter2/chap2-rotate-figure-example.png} 
+% %     \end{minipage}
+% %     \begin{minipage}[c]{0.1\textwidth}
+% %       \begin{adjustbox}{angle=90,center}
+% %         \begin{minipage}[c]{\textheight}
+% %           \caption{Minh họa chèn hình ảnh với caption xoay $90^{\circ}$}
+% %           \label{fig:img-caption-rotate}
+% %         \end{minipage}
+% %       \end{adjustbox}
+% %     \end{minipage}
+% % \end{figure}
+
+% % \begin{lstlisting}[language={[LaTeX]TeX}, caption={Chèn hình ảnh với caption xoay $90^{\circ}$}, label={lst:figure-with-caption-rotate}]
+% % \begin{figure}
+% %     \begin{minipage}[c]{0.8\textwidth}
+% %         \centering
+% %         \includegraphics[width=\textwidth]{chapter2/chap2-rotate-figure-example.png} 
+% %     \end{minipage}
+% %     \begin{minipage}[c]{0.1\textwidth}
+% %         \begin{adjustbox}{angle=90,center}
+% %         \begin{minipage}[c]{\textheight}
+% %             \caption{Figure caption}
+% %             \label{fig:img-caption-rotate}
+% %         \end{minipage}
+% %         \end{adjustbox}
+% %     \end{minipage}
+% % \end{figure}
+% % \end{lstlisting}
+
+% % Trong một số trường hợp, ta chỉ cần caption ở một bên hình ảnh chứ không xoay như hình \ref{fig:img-just-caption-side}, ta chỉ cần thực hiện như đoạn mã \ref{lst:figure-just-caption-side}.
+
+% % \begin{figure}
+% %     \begin{minipage}[c]{0.7\textwidth}
+% %       \includegraphics[width=\textwidth]{chapter2/chap2-rotate-figure-example.png}
+% %     \end{minipage}\hfill
+% %     \begin{minipage}[c]{0.2\textwidth}
+% %       \caption{
+% %         Figure caption
+% %       } \label{fig:img-just-caption-side}
+% %     \end{minipage}
+% % \end{figure}
+
+% % \begin{lstlisting}[language={[LaTeX]TeX}, caption={Chèn hình ảnh với caption ở bên phải $90^{\circ}$}, label={lst:figure-just-caption-side}]
+% % \begin{figure}
+% %     \begin{minipage}[c]{0.7\textwidth}
+% %         \includegraphics[width=\textwidth]{chapter2/chap2-rotate-figure-example.png}
+% %     \end{minipage}\hfill
+% %     \begin{minipage}[c]{0.2\textwidth}
+% %         \caption{
+% %             Figure caption
+% %         } \label{fig:img-just-caption-side}
+% %     \end{minipage}
+% % \end{figure}
+% % \end{lstlisting}
+
+\chapter{Hiện thực đề tài}
+\label{chap:chap2-implementation}
+
+Chương này trình bày quá trình hiện thực hoá đề tài, bao gồm thiết kế kiến trúc hệ thống, 
+triển khai hạ tầng, cấu hình môi trường và tích hợp các công cụ phục vụ vận hành và giám sát. 
+Nội dung chương tập trung mô tả cách các thành phần lý thuyết đã được trình bày ở Chương~1 
+được áp dụng vào thực tế thông qua các mô hình triển khai cụ thể.
+
+Hệ thống được hiện thực theo hướng phân tách rõ ràng giữa các môi trường kiểm thử và sản xuất, 
+nhằm đảm bảo tính an toàn, khả năng mở rộng và thuận tiện trong quá trình phát triển, đánh giá 
+và vận hành.
+
+\section{Thiết kế hệ thống}
+
+Phần này trình bày thiết kế tổng thể của hệ thống được đề xuất trong đề tài. 
+Thiết kế tập trung vào việc tổ chức hạ tầng mạng, cụm Kubernetes và các thành phần 
+giám sát theo mô hình hệ thống phân tán hiện đại. 
+
+Kiến trúc hệ thống được chia thành hai môi trường chính:
+\begin{itemize}
+    \item Môi trường kiểm thử (Staging environment),
+    \item Môi trường sản xuất (Production environment).
+\end{itemize}
+
+Mỗi môi trường được thiết kế với mục tiêu và mức độ phức tạp khác nhau, nhưng vẫn đảm bảo 
+tính nhất quán về kiến trúc để thuận lợi cho việc chuyển đổi và mở rộng trong thực tế.
+
+\subsection{Môi trường kiểm thử (Staging environment)}
+\label{subsec:chap2-staging}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.33]{chapter2/201-staging-environment}
+    \caption{Môi trường kiểm thử}
+    \label{fig:chap2-201-staging-environment}
+\end{figure}
+
+\textbf{Tổng quan thiết kế}
+
+Môi trường kiểm thử (staging environment) được xây dựng nhằm mô phỏng một hệ thống 
+phân tán hoàn chỉnh với kiến trúc gần tương đồng môi trường sản xuất, phục vụ cho 
+việc kiểm thử hạ tầng, Kubernetes và hệ thống quan sát trước khi triển khai chính 
+thức trên Amazon EKS.
+
+Toàn bộ môi trường staging được triển khai trên nền tảng điện toán đám mây AWS, 
+sử dụng một Virtual Private Cloud (VPC) riêng biệt nhằm đảm bảo tính cô lập mạng 
+và kiểm soát luồng truy cập. Cụm Kubernetes k0s được lựa chọn làm nền tảng orchestration 
+do tuân thủ chuẩn Kubernetes upstream, cho phép mô phỏng chính xác hành vi vận hành 
+của Kubernetes trong môi trường production nhưng với chi phí và độ phức tạp thấp hơn.
+
+Thiết kế môi trường staging tuân theo các nguyên tắc chính:
+\begin{itemize}
+    \item Phân tách rõ ràng giữa hạ tầng, nền tảng orchestration và workload,
+    \item Đảm bảo khả năng quan sát toàn diện hệ thống,
+    \item Duy trì tính nhất quán kiến trúc với môi trường production.
+\end{itemize}
+
+\textbf{Phân tích chi tiết thiết kế}
+
+\textit{\textbf{Thiết kế hạ tầng mạng}}
+
+Hạ tầng mạng của môi trường staging được triển khai trong một VPC duy nhất, 
+phân bố trên ba \textit{Availability Zone} nhằm mô phỏng điều kiện vận hành 
+của một hệ thống phân tán thực tế. Việc trải rộng tài nguyên trên nhiều AZ 
+giúp đánh giá khả năng chịu lỗi và hành vi của hệ thống khi xảy ra sự cố cục bộ.
+
+Trong VPC, các subnet được phân chia theo vai trò:
+\begin{itemize}
+    \item \textbf{Public subnet}: chứa các thành phần đóng vai trò điểm vào hệ thống, 
+    phục vụ truy cập từ bên ngoài như bastion host hoặc ingress gateway.
+    \item \textbf{Private subnet}: chứa các node Kubernetes và các thành phần quan sát, 
+    không được gán địa chỉ IP công khai và không truy cập trực tiếp từ Internet.
+\end{itemize}
+
+Mô hình này phản ánh kiến trúc triển khai phổ biến trong các hệ thống doanh nghiệp, 
+nơi workload được đặt trong mạng riêng nhằm tăng cường bảo mật, trong khi luồng truy cập 
+được kiểm soát thông qua các điểm vào xác định rõ ràng.
+
+\textit{\textbf{Thiết kế cụm Kubernetes k0s}}
+
+Cụm Kubernetes k0s trong môi trường staging được triển khai theo mô hình phân tách 
+vai trò giữa control plane và worker plane. Một node k0s controller đảm nhiệm vận hành 
+control plane, bao gồm API Server, Scheduler và Controller Manager. Các node worker 
+chịu trách nhiệm chạy workload ứng dụng và các Pod liên quan.
+
+Thiết kế này cho phép:
+\begin{itemize}
+    \item Mô phỏng kiến trúc Kubernetes chuẩn tương tự Amazon EKS,
+    \item Đánh giá hành vi scheduling và phân phối workload,
+    \item Tạo tiền đề cho việc kiểm thử các kịch bản mở rộng và thay thế node.
+\end{itemize}
+
+Tất cả các node được triển khai trên các máy ảo EC2 độc lập, đặt trong private subnet 
+và chỉ giao tiếp thông qua mạng nội bộ của VPC, qua đó đảm bảo tính cô lập và giảm thiểu 
+bề mặt tấn công từ bên ngoài.
+
+\textit{\textbf{Thiết kế lớp ứng dụng và cơ chế cân bằng tải}}
+
+Ứng dụng trong môi trường kiểm thử được triển khai theo kiến trúc microservices, 
+mỗi dịch vụ chạy trong các Pod riêng biệt. Kubernetes Service đóng vai trò trừu tượng 
+hoá việc giao tiếp giữa các dịch vụ, giúp giảm sự phụ thuộc trực tiếp và tăng khả năng 
+mở rộng của hệ thống.
+
+Ingress Controller (NGINX) được sử dụng để quản lý truy cập từ bên ngoài vào cụm Kubernetes, 
+thực hiện định tuyến lưu lượng dựa trên host hoặc path. Cơ chế này cho phép mô phỏng 
+định tuyến lớp 7 tương tự Application Load Balancer trong môi trường Amazon EKS.
+
+Bên cạnh đó, MetalLB được triển khai để cung cấp khả năng sử dụng 
+\textit{Service type LoadBalancer}. MetalLB phân phối địa chỉ IP từ dải địa chỉ được 
+cấu hình trước, giúp các dịch vụ trong cụm có thể truy cập từ bên ngoài mà không phụ 
+thuộc trực tiếp vào các dịch vụ managed của AWS.
+
+\textit{\textbf{Thiết kế hệ thống quan sát (Observability)}}
+
+Hệ thống quan sát được thiết kế theo mô hình tách biệt khỏi cụm Kubernetes. 
+Các thành phần Prometheus, Loki và Tempo được triển khai trên các máy ảo riêng biệt, 
+nằm trong cùng VPC nhưng không thuộc cụm k0s.
+
+Cách tiếp cận này mang lại các lợi ích:
+\begin{itemize}
+    \item Tránh ảnh hưởng hiệu năng của hệ thống giám sát đến workload,
+    \item Đảm bảo dữ liệu giám sát vẫn tồn tại khi cụm Kubernetes gặp sự cố,
+    \item Mô phỏng kiến trúc giám sát độc lập trong môi trường production.
+\end{itemize}
+
+Grafana đóng vai trò trung tâm trong việc truy vấn và trực quan hoá metrics, logs 
+và traces từ toàn bộ hệ thống, cung cấp cái nhìn tổng thể về trạng thái vận hành.
+
+\textbf{Mục tiêu thiết kế}
+
+Môi trường staging được xây dựng nhằm:
+\begin{itemize}
+    \item Kiểm thử cấu hình hạ tầng và Kubernetes trước khi triển khai production,
+    \item Đánh giá khả năng quan sát và phát hiện sự cố của hệ thống,
+    \item Kiểm tra luồng truy cập và cơ chế cân bằng tải,
+    \item Làm tiền đề cho việc triển khai tự động lên môi trường Amazon EKS.
+\end{itemize}
+
+Thiết kế này cho phép toàn bộ môi trường kiểm thử được mô tả và triển khai hoàn toàn 
+bằng Terraform kết hợp Ansible, đảm bảo tính nhất quán, khả năng tái sử dụng và thuận 
+lợi cho việc mở rộng sang môi trường sản xuất trong các giai đoạn tiếp theo của đề tài.
