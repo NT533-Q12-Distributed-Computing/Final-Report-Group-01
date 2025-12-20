@@ -1,0 +1,63 @@
+############################
+# LaTeX build artifacts
+############################
+*.aux
+*.bbl
+*.bcf
+*.blg
+*.fdb_latexmk
+*.fls
+*.glo
+*.gls
+*.glg
+*.ist
+*.lof
+*.log
+*.lot
+*.out
+*.toc
+*.run.xml
+*.synctex.gz
+*.acn
+*.acr
+*.alg
+*.idx
+*.ilg
+*.ind
+*.loa
+*.nav
+*.snm
+*.vrb
+*.xdv
+
+############################
+# PDF output (OPTIONAL)
+############################
+*.pdf
+
+############################
+# LaTeX temp directories
+############################
+chapters/**/**/*.aux
+chapters/**/**/*.log
+
+############################
+# Editor / OS junk
+############################
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
+
+############################
+# Backup & temp files
+############################
+*~
+*.bak
+*.swp
+*.tmp
+
+############################
+# Latexmk cache
+############################
+.latexmkrc
