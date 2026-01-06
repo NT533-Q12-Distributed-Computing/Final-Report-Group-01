@@ -329,6 +329,119 @@ ALB phù hợp cho các hệ thống:
     \item Yêu cầu xử lý SSL hoặc tích hợp AWS WAF để tăng cường bảo mật.
 \end{itemize}
 
+\subsubsection*{1.2.2.6 Karpenter – Node Autoscaler thế hệ mới cho Kubernetes}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.5]{chapter1/109-karpenter.png}
+    \caption{Karpenter – Node Autoscaler cho Kubernetes}
+    \label{fig:karpenter}
+\end{figure}
+
+Karpenter là một công cụ tự động mở rộng hạ tầng node (\textit{node autoscaler}) mã nguồn mở do Amazon Web Services phát triển, 
+được thiết kế nhằm tối ưu hoá quá trình cấp phát tài nguyên cho các cụm Kubernetes, 
+đặc biệt là trong môi trường Amazon Elastic Kubernetes Service (EKS).
+
+Trong các cụm Kubernetes truyền thống, việc mở rộng hạ tầng thường dựa trên các 
+\textit{node group} được định nghĩa sẵn với số lượng và cấu hình cố định. 
+Cách tiếp cận này có thể dẫn đến độ trễ trong quá trình scale hoặc lãng phí tài nguyên 
+khi workload biến động mạnh. Karpenter ra đời nhằm giải quyết các hạn chế này bằng cách 
+tự động khởi tạo node dựa trực tiếp trên nhu cầu thực tế của workload.
+
+\paragraph*{Ưu điểm}
+
+Karpenter mang lại nhiều lợi ích đáng kể trong việc quản lý và mở rộng hạ tầng 
+Kubernetes, đặc biệt phù hợp với các hệ thống cloud–native và kiến trúc microservices 
+có tải biến động theo thời gian.
+
+Trước hết, Karpenter cho phép \textbf{mở rộng hạ tầng linh hoạt dựa trên nhu cầu thực tế của workload}. 
+Thay vì phụ thuộc vào các node group được định nghĩa sẵn với cấu hình cố định, 
+hệ thống có thể khởi tạo các node phù hợp với yêu cầu tài nguyên của Pod, 
+từ đó giảm thiểu tình trạng thiếu hụt hoặc lãng phí tài nguyên.
+
+Thứ hai, Karpenter giúp \textbf{rút ngắn thời gian phản ứng khi tải tăng đột biến}. 
+Việc khởi tạo node mới được thực hiện trực tiếp khi xuất hiện Pod không thể lập lịch, 
+giúp hệ thống nhanh chóng đáp ứng nhu cầu tài nguyên mà không cần chờ cơ chế điều chỉnh 
+kích thước của node group truyền thống.
+
+Bên cạnh đó, Karpenter hỗ trợ \textbf{tối ưu chi phí hạ tầng}. 
+Nhờ khả năng lựa chọn linh hoạt loại node phù hợp với workload, 
+hệ thống tránh được việc duy trì các node có cấu hình lớn nhưng không được khai thác hiệu quả, 
+đặc biệt trong các giai đoạn tải thấp.
+
+Cuối cùng, Karpenter góp phần nâng cao \textbf{mức độ tự động hoá và tính tự chủ của hệ thống}. 
+Hạ tầng có thể tự điều chỉnh theo nhu cầu vận hành mà không cần can thiệp thủ công thường xuyên, 
+phù hợp với định hướng xây dựng các hệ thống phân tán hiện đại có khả năng mở rộng cao.
+
+\paragraph*{Hạn chế}
+
+Bên cạnh các ưu điểm, Karpenter cũng tồn tại một số hạn chế cần được xem xét trong quá trình 
+thiết kế và vận hành hệ thống.
+
+Trước hết, Karpenter \textbf{phụ thuộc chặt chẽ vào hạ tầng đám mây bên dưới}. 
+Quá trình lựa chọn và khởi tạo node gắn liền với API của nhà cung cấp dịch vụ, 
+do đó đòi hỏi cấu hình quyền truy cập, chính sách bảo mật và quản lý tài nguyên 
+được thiết kế cẩn thận.
+
+Ngoài ra, việc mở rộng node một cách linh hoạt có thể làm tăng 
+\textbf{độ phức tạp trong giám sát và quản lý}. 
+Số lượng và loại node trong cụm có thể thay đổi liên tục, 
+đòi hỏi hệ thống monitoring và logging phải được xây dựng đầy đủ 
+để theo dõi trạng thái, hiệu năng và chi phí vận hành.
+
+Cuối cùng, Karpenter yêu cầu \textbf{xây dựng các chính sách cấu hình phù hợp với mục tiêu vận hành}. 
+Nếu các ràng buộc tài nguyên hoặc chiến lược mở rộng không được xác định rõ ràng, 
+hệ thống có thể phát sinh các node không tối ưu về chi phí hoặc không phù hợp 
+với yêu cầu thực tế của workload.
+
+
+\paragraph*{Cơ chế hoạt động}
+
+Karpenter hoạt động dựa trên sự phối hợp chặt chẽ với Kubernetes Scheduler. 
+Khi trong cụm xuất hiện các Pod không thể được lập lịch do thiếu tài nguyên, 
+Karpenter sẽ phân tích yêu cầu của các Pod này và đưa ra quyết định mở rộng hạ tầng phù hợp.
+
+Quy trình hoạt động tổng quát của Karpenter bao gồm các bước sau:
+
+\begin{enumerate}
+    \item Kubernetes Scheduler phát hiện các Pod ở trạng thái \textit{Pending} do không đủ tài nguyên.
+    \item Karpenter quan sát các Pod này và thu thập các yêu cầu về CPU, bộ nhớ, kiến trúc hệ thống, 
+    ràng buộc topology, taints và labels.
+    \item Dựa trên các chính sách cấu hình, Karpenter lựa chọn loại node phù hợp từ hạ tầng đám mây.
+    \item Node mới được khởi tạo và tự động tham gia vào cụm Kubernetes.
+    \item Các Pod được lập lịch lên node mới và hệ thống tiếp tục vận hành ổn định.
+\end{enumerate}
+
+Nhờ cơ chế này, Karpenter cho phép mở rộng hạ tầng theo mô hình \textbf{just-in-time}, 
+giảm thiểu việc duy trì tài nguyên dư thừa và rút ngắn thời gian phản ứng khi tải tăng đột biến.
+
+\paragraph*{So sánh với Cluster Autoscaler}
+
+So với \textit{Cluster Autoscaler}, Karpenter mang lại nhiều cải tiến quan trọng trong 
+quản lý hạ tầng Kubernetes:
+
+\begin{itemize}
+    \item \textbf{Không phụ thuộc node group}: Karpenter không yêu cầu cấu hình sẵn các nhóm node cố định.
+    \item \textbf{Khả năng phản ứng nhanh}: node mới được tạo trực tiếp dựa trên nhu cầu của Pod đang chờ.
+    \item \textbf{Tối ưu chi phí}: tự động lựa chọn cấu hình node phù hợp với workload thay vì chỉ mở rộng theo kích thước định trước.
+    \item \textbf{Tính linh hoạt cao}: hỗ trợ đa dạng cấu hình node cho các loại workload khác nhau trong cùng một cụm.
+\end{itemize}
+
+Nhờ những đặc điểm này, Karpenter đặc biệt phù hợp với các hệ thống microservices 
+có tải biến động và yêu cầu khả năng mở rộng linh hoạt theo thời gian thực.
+
+\paragraph*{Vai trò của Karpenter trong kiến trúc Amazon EKS}
+
+Trong kiến trúc Amazon EKS hiện đại, Karpenter thường được sử dụng kết hợp với các cơ chế 
+mở rộng ở tầng ứng dụng như \textit{Horizontal Pod Autoscaler} (HPA). 
+Trong mô hình này, HPA chịu trách nhiệm mở rộng số lượng Pod dựa trên tải, 
+trong khi Karpenter đảm nhiệm việc mở rộng hạ tầng node tương ứng để đảm bảo 
+tài nguyên luôn sẵn sàng cho các Pod mới.
+
+Sự kết hợp giữa HPA và Karpenter giúp hệ thống đạt được khả năng tự thích nghi cao, 
+đáp ứng hiệu quả các yêu cầu về hiệu năng, độ sẵn sàng và tối ưu chi phí, 
+đồng thời phù hợp với các kiến trúc hệ thống phân tán và microservices trên nền tảng Kubernetes.
+
 % 1.2.3 K0s
 
 \subsection*{1.2.3 K0s}
