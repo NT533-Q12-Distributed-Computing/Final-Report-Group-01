@@ -1,3 +1,137 @@
-\chapter{Hướng dẫn soạn phụ lục}
+% =========================
+% PHỤ LỤC
+% =========================
 
-\lipsum[4]
+\chapter*{PHỤ LỤC}
+\addcontentsline{toc}{chapter}{PHỤ LỤC}
+\markboth{PHỤ LỤC}{PHỤ LỤC}
+
+% -------------------------------------------------
+% Bảng phân chia nhiệm vụ
+% -------------------------------------------------
+\section*{Bảng phân chia nhiệm vụ}
+\phantomsection
+\addcontentsline{toc}{section}{Bảng phân chia nhiệm vụ}
+
+\begin{table}[H]
+\centering
+\caption{Bảng phân chia nhiệm vụ các thành viên}
+\label{tab:task-assignment}
+
+\renewcommand{\arraystretch}{1.4}
+\begin{tabular}{
+|>{\centering\arraybackslash}p{4cm}
+|>{\centering\arraybackslash}p{8cm}
+|>{\centering\arraybackslash}p{3cm}|
+}
+\hline
+\textbf{Tên thành viên} & \textbf{Nhiệm vụ} & \textbf{Tỉ lệ hoàn thành} \\ \hline
+
+Nguyễn Tiến Phát &
+\begin{itemize}
+    \item Thiết kế cơ sở hạ tầng hệ thống
+    \item Viết script Terraform
+    \item Cấu hình Ansible cho các thành phần hạ tầng
+    \item Triển khai và cấu hình Kubernetes
+    \item Chuẩn bị slide thuyết trình
+    \item Viết báo cáo
+\end{itemize}
+& 100\% \\ \hline
+
+Nguyễn Tài Phú &
+\begin{itemize}
+    \item Triển khai ứng dụng microservices
+    \item Viết và cấu hình Kubernetes manifest cho ứng dụng
+    \item Viết báo cáo
+\end{itemize}
+& 100\% \\ \hline
+
+\end{tabular}
+\end{table}
+
+\clearpage
+
+% -------------------------------------------------
+% Tài nguyên đồ án
+% -------------------------------------------------
+\section*{Tài nguyên đồ án}
+\phantomsection
+\addcontentsline{toc}{section}{Tài nguyên đồ án}
+
+Nhằm phục vụ cho việc tham khảo, đánh giá và tái sử dụng kết quả của đề tài, nhóm
+cung cấp các tài nguyên liên quan bao gồm slide thuyết trình và mã nguồn triển khai
+hệ thống. Các tài nguyên này được lưu trữ trực tuyến và có thể truy cập thông qua
+các liên kết sau:
+
+\begin{itemize}
+    \item \textbf{Slide thuyết trình:} \\
+    \href{https://drive.google.com/drive/folders/1DX2yMvPsaUAYSylsWpX3x7XvMinTPM6z}
+    {Google Drive – Slide thuyết trình đồ án}
+
+    \item \textbf{Mã nguồn đồ án:} \\
+    \href{https://github.com/NT533-Q12-Distributed-Computing}
+    {GitHub – NT533-Q12-Distributed-Computing}
+\end{itemize}
+
+Các tài nguyên trên phản ánh đầy đủ quá trình thiết kế, triển khai và đánh giá hệ
+thống trong phạm vi đề tài, đồng thời có thể được sử dụng làm cơ sở tham khảo cho
+các nghiên cứu và đồ án liên quan trong tương lai.
+
+\clearpage
+
+% -------------------------------------------------
+% Tài liệu tham khảo
+% -------------------------------------------------
+\section*{Tài liệu tham khảo}
+\phantomsection
+\addcontentsline{toc}{section}{Tài liệu tham khảo}
+
+Trong quá trình thực hiện đề tài, nhóm đã tham khảo các tài liệu chính thống
+liên quan đến DevOps, hệ thống phân tán, Kubernetes, hạ tầng cloud-native và
+các công cụ quan sát hệ thống. Các tài liệu này đóng vai trò nền tảng lý thuyết
+và hướng dẫn triển khai cho toàn bộ nội dung của đồ án.
+
+\begin{itemize}
+    \item \textbf{Kubernetes và hệ thống phân tán}
+    \begin{itemize}
+        \item \href{https://kubernetes.io/docs/concepts/}
+        {Kubernetes Documentation – Core Concepts}
+        
+        \item \href{https://kubernetes.io/docs/tasks/run-application/horizontal-pod-autoscale/}
+        {Kubernetes Documentation – Horizontal Pod Autoscaler}
+        
+    \end{itemize}
+
+    \item \textbf{Giám sát và quan sát hệ thống (Observability)}
+    \begin{itemize}
+        \item \href{https://prometheus.io/docs/introduction/overview/}
+        {Prometheus – Monitoring System Overview}
+        
+        \item \href{https://grafana.com/docs/}
+        {Grafana – Visualization and Dashboard Documentation}
+        
+        \item \href{https://grafana.com/oss/loki/}
+        {Grafana Loki – Log Aggregation System}
+        
+        \item \href{https://www.cncf.io/projects/}
+        {Cloud Native Computing Foundation – Cloud Native Projects}
+    \end{itemize}
+
+    \item \textbf{Hạ tầng và tự động hoá}
+    \begin{itemize}
+        \item \href{https://developer.hashicorp.com/terraform/intro}
+        {HashiCorp Terraform – Infrastructure as Code}
+        
+        \item \href{https://docs.ansible.com/}
+        {Ansible Documentation – Automation Platform}
+        
+        \item \href{https://docs.aws.amazon.com/eks/latest/userguide/what-is-eks.html}
+        {Amazon EKS – User Guide}
+    \end{itemize}
+
+    \item \textbf{Độ tin cậy hệ thống}
+    \begin{itemize}
+        \item \href{https://sre.google/books/}
+        {Google – Site Reliability Engineering}
+    \end{itemize}
+\end{itemize}

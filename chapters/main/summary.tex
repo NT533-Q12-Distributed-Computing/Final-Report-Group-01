@@ -1,18 +1,26 @@
-\chapter*{\centering{Tóm tắt khóa luận}}
-\addcontentsline{toc}{chapter}{Tóm tắt khóa luận}
+\chapter*{\centering{Tóm tắt đồ án}}
+\addcontentsline{toc}{chapter}{Tóm tắt đồ án}
 
-Vào năm 2021, dù cảm thấy không có đủ năng lực để theo tiếp đồ án chuyên ngành, mình thực hiện khóa luận do chương trình đào tạo cũ bắt buộc làm luận văn. Nhóm mình hai người, thực hiện tìm hiểu và viết luận văn trong khoảng thời gian dịch bệnh đầy khó khăn.
+Đồ án này trình bày quá trình thiết kế và triển khai một hệ thống tính toán phân bố
+có tính sẵn sàng cao cho ứng dụng microservices trên nền tảng Amazon Elastic Kubernetes Service (EKS).
+Mục tiêu của đồ án là xây dựng một kiến trúc hệ thống phân tán có khả năng chịu lỗi,
+tự động mở rộng và duy trì dịch vụ ổn định trong các điều kiện tải và sự cố hạ tầng khác nhau.
 
-Làm xong rồi, nhưng việc báo cáo nó cũng không phải dễ. Mỗi người một nơi, cùng làm việc trên Word khó khăn do định dạng không đồng bộ, chèn hình và bảng làm xáo trộn các trang, đánh số bảng biểu, hình ảnh, tiêu đề dễ bị sai sót. Khó khăn nhất là việc viết và đánh số tài liệu tham khảo.
+Trong phạm vi nghiên cứu, nhóm triển khai cụm Kubernetes trên Amazon EKS
+theo mô hình đa vùng sẵn sàng (Multi-AZ),
+kết hợp các cơ chế điều phối container, cân bằng tải và quản lý vòng đời ứng dụng.
+Hệ thống được thiết kế nhằm đảm bảo các thành phần ứng dụng có thể tiếp tục hoạt động
+ngay cả khi xảy ra lỗi tại một hoặc nhiều node trong cụm.
 
-Sau này, khi học thạc sĩ và làm việc trên linux, một mặt cần tính chuyên nghiệp cao trong viết báo cáo, mặt khác sử dụng Word online trên linux rất bất tiện, mình đã làm quen và dần dần chuyển hẳn việc viết báo cáo trên latex, kể cả các báo cáo ở công ty.
+Bên cạnh hạ tầng chính, đồ án xây dựng hệ thống giám sát và quan sát
+(\textit{Observability}) cho cụm Kubernetes,
+bao gồm giám sát tài nguyên và trạng thái hệ thống bằng Prometheus,
+trực quan hóa dữ liệu bằng Grafana,
+và thu thập, phân tích log tập trung thông qua Grafana Loki.
+Hệ thống này giúp theo dõi hiệu năng, phát hiện bất thường
+và hỗ trợ phân tích sự cố trong quá trình vận hành.
 
-Nhằm lưu lại các cú pháp mình sử dụng, đồng thời giúp các bạn sinh viên viết khóa luận dễ dàng hơn, mình đã thiết kế và viết báo cáo này. Các bạn sinh viên UIT nói riêng và người dùng khác nói chung có thể tùy ý sử dụng, thay đổi dự án này tùy theo nhu cầu.
-
-Phần còn lại của luận văn có cấu trúc như sau
-\begin{itemize}
-    \item Chương \ref{chap:chap1-introduce} giới thiệu khái quát chung về cấu trúc thư mục trong dự án, các cài đặt, cấu hình cần thay đổi khi sử dụng.
-    \item Chương \ref{chap:chap2-figures} trình bày các kỹ thuật chèn hình ảnh.
-    \item Chương \ref{chap:chap3-table} trình bày các kỹ thuật chèn bảng.
-    \item Chương \ref{chap:chap4-summary} lưu ý một số các kỹ thuật còn lại.
-\end{itemize}
+Kết quả của đồ án cho thấy kiến trúc được đề xuất đáp ứng tốt các yêu cầu
+về tính sẵn sàng, khả năng mở rộng và khả năng giám sát,
+đồng thời phù hợp với các nguyên lý của hệ thống tính toán phân bố
+và kiến trúc microservices hiện đại.

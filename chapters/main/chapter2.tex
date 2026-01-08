@@ -561,6 +561,7 @@ nhất quán và có kiểm soát.
 \end{figure}
 
 \clearpage
+
 Trong quá trình triển khai, Ansible lần lượt thực hiện các bước chính bao gồm:
 \begin{itemize}
     \item Sinh chứng chỉ máy chủ và client thông qua Easy-RSA,
@@ -596,3 +597,550 @@ private subnet như các node Kubernetes, các máy chủ observability và các
 Việc triển khai và kiểm tra kết nối OpenVPN thành công đóng vai trò quan trọng trong kiến trúc 
 hạ tầng của hệ thống, cho phép quản trị viên truy cập và vận hành toàn bộ hạ tầng cloud một cách 
 an toàn mà không cần mở trực tiếp các cổng quản trị ra Internet.
+
+\section{Cấu hình hệ thống giám sát và ghi log}
+
+\subsection{Cấu hình hệ thống giám sát (Monitoring)}
+\label{subsec:chap2-monitoring}
+
+Trong hệ thống phân tán, việc giám sát trạng thái hạ tầng và các thành phần Kubernetes đóng vai
+trò quan trọng nhằm theo dõi hiệu năng, phát hiện sớm sự cố và đánh giá khả năng chịu lỗi của hệ
+thống. Trong đề tài này, Prometheus được lựa chọn làm công cụ giám sát trung tâm, đảm nhiệm việc
+thu thập, lưu trữ và truy vấn metric từ cả hạ tầng vật lý lẫn cụm Kubernetes.
+
+Prometheus được triển khai theo mô hình \textit{external monitoring}, tức là hệ thống giám sát
+được cài đặt trên một máy chủ observability độc lập, nằm ngoài cụm Kubernetes. Cách tiếp cận
+này giúp đảm bảo hệ thống giám sát vẫn hoạt động ngay cả khi cụm Kubernetes gặp sự cố, đồng thời
+phù hợp với kiến trúc triển khai thực tế trong các hệ thống cloud-native.
+
+\subsubsection*{Triển khai Prometheus bằng Ansible}
+
+Việc cài đặt và cấu hình Prometheus được tự động hoá hoàn toàn thông qua Ansible role
+\texttt{observability/prometheus}. Role này thực hiện toàn bộ quá trình cài đặt Prometheus,
+bao gồm tạo user hệ thống, chuẩn bị thư mục cấu hình và dữ liệu, tải Prometheus binary từ
+nguồn chính thức và cấu hình Prometheus chạy dưới dạng một dịch vụ systemd.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.34]{chapter2/prometheus-install-tasks.png}
+    \caption{Các task Ansible triển khai Prometheus trên máy chủ observability}
+    \label{fig:chap2-prometheus-install-tasks}
+\end{figure}
+
+Prometheus được cấu hình chạy dưới user riêng nhằm đảm bảo nguyên tắc phân quyền tối thiểu.
+Việc quản lý Prometheus thông qua systemd cho phép dịch vụ tự động khởi động cùng hệ thống và
+tự phục hồi khi xảy ra lỗi trong quá trình vận hành.
+
+\subsubsection*{Cấu hình Prometheus và cơ chế Service Discovery}
+
+Cấu hình chính của Prometheus được định nghĩa thông qua file cấu hình template \texttt{prometheus.yml.j2}. File cấu hình này mô tả các tham số toàn cục như chu kỳ scrape,
+thời gian đánh giá rule và danh sách các job thu thập metric.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.42]{chapter2/prometheus-config.png}
+    \caption{Cấu hình thu thập metric trong file prometheus.yml.j2}
+    \label{fig:chap2-prometheus-config}
+\end{figure}
+
+Prometheus được cấu hình sử dụng \textit{Kubernetes Service Discovery} thông qua file kubeconfig,
+cho phép tự động phát hiện các endpoint trong cluster Kubernetes. Cơ chế này giúp Prometheus
+không phụ thuộc vào địa chỉ IP cố định và thích ứng tốt với môi trường Kubernetes có tính động cao.
+
+Các job scrape chính trong hệ thống bao gồm:
+\begin{itemize}
+    \item Giám sát chính Prometheus,
+    \item Thu thập metric hạ tầng từ Node Exporter,
+    \item Thu thập metric trạng thái Kubernetes từ kube-state-metrics.
+\end{itemize}
+
+\subsubsection*{Triển khai Node Exporter và kube-state-metrics}
+
+Node Exporter được sử dụng để thu thập các metric liên quan đến tài nguyên hệ thống của từng node
+trong cluster như CPU, bộ nhớ, ổ đĩa và network. Thành phần này được triển khai bên trong cụm
+Kubernetes thông qua Helm chart bằng Ansible role \texttt{node\_exporter}.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.3]{chapter2/node-exporter-install.png}
+    \caption{Triển khai Node Exporter trong cụm Kubernetes bằng Helm}
+    \label{fig:chap2-node-exporter-install}
+\end{figure}
+
+Bên cạnh đó, kube-state-metrics được triển khai để cung cấp các metric phản ánh trạng thái logic
+của Kubernetes như Pod, Deployment, ReplicaSet và Node. Các metric này cho phép theo dõi tình
+trạng vận hành của cluster ở mức đối tượng Kubernetes thay vì chỉ tài nguyên vật lý.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.3]{chapter2/kube-state-metrics-install.png}
+    \caption{Triển khai kube-state-metrics trong namespace monitoring}
+    \label{fig:chap2-kube-state-metrics-install}
+\end{figure}
+
+Prometheus sử dụng Kubernetes Service Discovery để tự động phát hiện các endpoint của
+Node Exporter và kube-state-metrics, đồng thời gắn thêm các nhãn như \texttt{node} và
+\texttt{cluster} cho metric. Cách tiếp cận này giúp phân biệt metric theo từng node và từng
+môi trường, tạo tiền đề cho việc mở rộng giám sát nhiều cụm Kubernetes trong các hướng phát triển tương lai.
+
+Thông qua việc kết hợp Prometheus, Node Exporter và kube-state-metrics, hệ thống giám sát có
+khả năng quan sát toàn diện cả ở mức hạ tầng lẫn mức Kubernetes, đáp ứng yêu cầu theo dõi,
+đánh giá và phân tích hoạt động của hệ thống phân tán trong phạm vi đề tài.
+
+\subsection{Cấu hình hệ thống ghi log (Logging)}
+\label{subsec:chap2-logging}
+
+Trong hệ thống phân tán, log đóng vai trò quan trọng trong việc phân tích hành vi hệ thống,
+truy vết sự cố và hỗ trợ quá trình khắc phục lỗi. Khác với metric chỉ phản ánh trạng thái
+tại một thời điểm, log cung cấp thông tin chi tiết về diễn biến của các sự kiện trong hệ
+thống theo thời gian.
+
+Trong đề tài, hệ thống ghi log được xây dựng dựa trên bộ công cụ Loki và Promtail.
+Loki đóng vai trò là hệ thống tập trung lưu trữ và truy vấn log, trong khi Promtail
+là agent thu thập log chạy trong cụm Kubernetes và gửi log về Loki.
+Toàn bộ quá trình triển khai và cấu hình hệ thống logging được tự động hoá bằng Ansible,
+đảm bảo tính nhất quán và khả năng tái triển khai.
+
+\textbf{Triển khai Loki bằng Ansible}
+
+Loki được triển khai trên máy chủ observability độc lập, tách biệt khỏi cụm Kubernetes.
+Việc cài đặt Loki được thực hiện thông qua Ansible role riêng, bao gồm các bước chuẩn bị
+môi trường, tải binary, cấu hình và khởi động dịch vụ dưới dạng systemd service.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.32]{chapter2/loki-ansible-task.png}
+    \caption{Triển khai Loki bằng Ansible}
+    \label{fig:chap2-loki-ansible-task}
+\end{figure}
+
+Trong quá trình triển khai, Ansible thực hiện tạo user hệ thống cho Loki, chuẩn bị các thư mục
+lưu trữ dữ liệu và cấu hình, tải binary chính thức của Loki từ GitHub và thiết lập dịch vụ
+Loki chạy nền trên hệ điều hành. Việc quản lý Loki dưới dạng systemd service giúp đảm bảo
+dịch vụ luôn sẵn sàng và tự động khởi động lại khi xảy ra sự cố.
+
+\textbf{Cấu hình Loki}
+
+Cấu hình Loki được định nghĩa trong file \texttt{loki.yaml}, mô tả cách thức Loki tiếp nhận,
+lưu trữ và quản lý dữ liệu log. Trong phạm vi đề tài, Loki được cấu hình ở chế độ single-node,
+sử dụng filesystem làm backend lưu trữ nhằm đơn giản hoá triển khai và phù hợp với môi trường
+thử nghiệm và đánh giá.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.34]{chapter2/loki-config.png}
+    \caption{Cấu hình hệ thống ghi log trong Loki}
+    \label{fig:chap2-loki-config}
+\end{figure}
+
+Loki được cấu hình lắng nghe trên cổng HTTP 3100 để tiếp nhận log từ Promtail.
+Cơ chế lưu trữ sử dụng \textit{boltdb-shipper} kết hợp filesystem cho phép quản lý index
+và chunk log hiệu quả. Chính sách lưu trữ được thiết lập với thời gian giữ log là 7 ngày,
+đáp ứng nhu cầu phân tích và truy vết sự cố trong phạm vi đề tài.
+
+\textbf{Triển khai Promtail trong Kubernetes}
+
+Promtail đóng vai trò là agent thu thập log, được triển khai trực tiếp trong cụm Kubernetes
+thông qua Helm chart. Ansible được sử dụng để tự động hoá quá trình render file cấu hình
+và cài đặt Promtail vào cluster.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.27]{chapter2/promtail-ansible-task.png}
+    \caption{Triển khai Promtail trong Kubernetes bằng Ansible}
+    \label{fig:chap2-promtail-ansible-task}
+\end{figure}
+
+Promtail được triển khai trong namespace riêng phục vụ cho hệ thống observability,
+cho phép thu thập log từ toàn bộ Pod và container trong cụm Kubernetes mà không cần
+can thiệp vào cấu hình ứng dụng.
+
+\textbf{Cấu hình pipeline thu thập log}
+
+Cấu hình chi tiết của Promtail được định nghĩa trong file values sử dụng cho Helm chart.
+File cấu hình này mô tả pipeline thu thập log, bao gồm vị trí lưu trạng thái đọc log,
+nguồn thu thập log và các nhãn (label) được gắn kèm theo mỗi bản ghi log.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.26]{chapter2/promtail-config.png}
+    \caption{Cấu hình pipeline thu thập log của Promtail}
+    \label{fig:chap2-promtail-config}
+\end{figure}
+
+Promtail sử dụng Kubernetes Service Discovery để tự động phát hiện các Pod trong cluster
+và thu thập log từ thư mục \texttt{/var/log/pods}. Các nhãn như namespace, pod, container
+và node được gắn vào log trước khi gửi về Loki, giúp việc truy vấn và phân tích log
+trong Grafana trở nên trực quan và hiệu quả hơn.
+
+Thông qua việc kết hợp Loki và Promtail, hệ thống logging có khả năng thu thập và tập trung
+toàn bộ log từ các workload Kubernetes về một điểm duy nhất, tạo nền tảng cho việc phân tích,
+truy vết sự cố và trực quan hoá log trong các bước tiếp theo của hệ thống quan sát.
+
+\subsection{Cấu hình Dashboard cho Prometheus sử dụng Grafana}
+\label{subsec:chap2-grafana-dashboard}
+
+Sau khi hoàn tất việc thu thập metric và log thông qua Prometheus, Node Exporter,
+kube-state-metrics và Loki, Grafana được sử dụng làm công cụ trung tâm để trực quan
+hoá dữ liệu quan sát của hệ thống. Grafana cho phép tổng hợp, truy vấn và hiển thị
+đồng thời các thông tin về tài nguyên hạ tầng, trạng thái Kubernetes và hành vi của
+workload ứng dụng trên một giao diện thống nhất, hỗ trợ quá trình theo dõi và đánh
+giá trạng thái vận hành của hệ thống phân tán.
+
+Trong phạm vi đề tài, nhóm tự xây dựng một dashboard dựa trên các metric chuẩn được
+cung cấp bởi Prometheus. Dashboard được thiết kế theo hướng tổng quan, sau đó hiệu
+chỉnh các truy vấn PromQL và bố cục hiển thị nhằm phản ánh đúng kiến trúc hệ thống
+triển khai cũng như phục vụ mục tiêu đánh giá khả năng quan sát và hành vi tự động
+mở rộng của hệ thống.
+
+Dashboard được xây dựng với mục tiêu cung cấp cái nhìn toàn diện về trạng thái vận
+hành của cụm Kubernetes, bao gồm mức sử dụng tài nguyên CPU và bộ nhớ, tình trạng
+phân bố tải trên các node, trạng thái của workload ứng dụng và cơ chế tự động mở
+rộng Horizontal Pod Autoscaler (HPA). Các thông tin này được thể hiện dưới dạng biểu
+đồ theo thời gian, cho phép quan sát xu hướng biến động tài nguyên và phản ứng của
+hệ thống trước sự thay đổi tải.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.41]{chapter2/45-Dashboard.png}
+    \caption{Dashboard giám sát tổng quan hệ thống và HPA trên Grafana}
+    \label{fig:chap2-grafana-dashboard}
+\end{figure}
+
+Dashboard tập trung sử dụng một tập các hàm tính toán tiêu biểu nhằm quan sát trạng
+thái vận hành của hệ thống phân tán. Các hàm này được lựa chọn để làm rõ mối quan hệ
+giữa tài nguyên hạ tầng, workload ứng dụng và cơ chế tự động mở rộng HPA, qua đó hỗ
+trợ việc đánh giá khả năng chịu tải và mức độ ổn định của hệ thống trong các kịch
+bản thử nghiệm.
+
+Trong phạm vi đề tài, dashboard Grafana được sử dụng như một công cụ minh hoạ trực
+quan cho khả năng quan sát hệ thống, phục vụ cho việc theo dõi, phân tích và trình
+bày kết quả triển khai. Việc xây dựng dashboard tập trung vào các hàm tính toán cốt
+lõi và các chỉ số quan trọng, thay vì đi sâu vào tối ưu hoá hoặc phát triển hệ thống
+dashboard chuyên sâu cho môi trường sản xuất.
+
+\subsection{Cấu hình Dashboard Loki cho hệ thống ghi log}
+\label{subsec:chap2-loki-dashboard}
+
+Bên cạnh hệ thống giám sát metric, hệ thống ghi log tập trung đóng vai trò quan trọng
+trong việc quan sát chi tiết hành vi của các thành phần trong hệ thống phân tán.
+Trong đề tài này, Loki được sử dụng làm nền tảng thu thập và lưu trữ log, trong khi
+Grafana đóng vai trò giao diện trực quan để truy vấn và hiển thị log thông qua
+dashboard Loki.
+
+Dashboard Loki được xây dựng nhằm hỗ trợ việc truy vấn log theo thời gian và theo
+các nhãn đặc trưng của Kubernetes như namespace, container và stream. Thông qua các
+bộ lọc này, người vận hành có thể nhanh chóng khoanh vùng phạm vi log cần phân tích,
+từ đó hỗ trợ quá trình truy vết sự cố và đánh giá trạng thái hoạt động của hệ thống.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.21]{chapter2/loki-kubernetes-logs.png}
+    \caption{Dashboard truy vấn log Kubernetes trên Grafana sử dụng Loki}
+    \label{fig:chap2-loki-dashboard}
+\end{figure}
+
+Dashboard hiển thị các bản ghi log theo trục thời gian, cho phép quan sát diễn biến
+sự kiện của hệ thống trong từng giai đoạn vận hành. Các log được thu thập trực tiếp
+từ container và pod trong cụm Kubernetes, phản ánh thông tin chi tiết như trạng thái
+khởi động dịch vụ, thông báo hệ thống và các sự kiện liên quan đến mạng và tài nguyên.
+
+Khác với metric chỉ phản ánh trạng thái tài nguyên tại một thời điểm, log cung cấp
+thông tin chi tiết về quá trình thực thi và các thông báo nội bộ của từng thành phần.
+Việc kết hợp dashboard Loki với dashboard giám sát metric giúp hoàn thiện mô hình
+quan sát (observability), cho phép đánh giá hệ thống ở cả mức tổng quan và mức chi
+tiết trong phạm vi đề tài.
+
+Trong phạm vi triển khai, dashboard Loki được sử dụng như một công cụ hỗ trợ phân
+tích và minh hoạ khả năng ghi log tập trung của hệ thống, phục vụ cho việc theo dõi,
+truy vết sự cố và trình bày kết quả triển khai, thay vì đi sâu vào tối ưu hoá hệ
+thống logging cho môi trường sản xuất.
+
+\clearpage
+
+\section{Triển khai ứng dụng microservices}
+\label{subsec:chap2-microservices-deployment}
+
+\subsection{Tổng quan ứng dụng}
+\label{subsubsec:chap2-microservices-overview}
+
+Ứng dụng được triển khai trong đề tài là một hệ thống microservices dựa trên nền
+tảng Spring Cloud, được thiết kế theo kiến trúc phân tán nhằm minh hoạ quá trình
+triển khai, vận hành và giám sát ứng dụng trong môi trường Kubernetes trên hạ tầng
+cloud. Hệ thống được xây dựng theo mô hình tách biệt rõ ràng giữa các thành phần
+quản lý cấu hình, khám phá dịch vụ, điều phối truy cập và các dịch vụ nghiệp vụ.
+
+Về mặt kiến trúc, hệ thống bao gồm các thành phần trung tâm như Config Server,
+Discovery Server và API Gateway, đóng vai trò hỗ trợ quản lý cấu hình tập trung,
+khám phá dịch vụ và định tuyến request. Các dịch vụ nghiệp vụ được triển khai độc
+lập, giao tiếp thông qua API Gateway và được quản lý bởi Service Discovery, đảm
+bảo tính linh hoạt và khả năng mở rộng của hệ thống.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.35]{chapter2/petclinic-standard-architecture.png}
+    \caption{Sơ đồ kiến trúc tổng quan ứng dụng microservices}
+    \label{fig:chap2-microservices-architecture}
+\end{figure}
+
+Hệ thống microservices trong đề tài bao gồm các thành phần chính sau:
+\begin{itemize}
+    \item \textbf{Config Server}: cung cấp cơ chế quản lý cấu hình tập trung cho toàn
+    bộ hệ thống, cho phép các service tải cấu hình động từ repository cấu hình.
+    \item \textbf{Discovery Server}: đóng vai trò service registry, cho phép các
+    service đăng ký và khám phá lẫn nhau trong quá trình vận hành.
+    \item \textbf{API Gateway}: là điểm truy cập duy nhất của hệ thống, chịu trách
+    nhiệm định tuyến request từ phía người dùng đến các service backend tương ứng.
+    \item \textbf{Admin Server}: hỗ trợ theo dõi trạng thái hoạt động của các service
+    ở mức ứng dụng.
+    \item \textbf{Customers Service, Visits Service, Vets Service}: các service
+    nghiệp vụ độc lập, xử lý các chức năng chính của ứng dụng.
+\end{itemize}
+
+\subsection{Triển khai ứng dụng}
+
+Toàn bộ các service được container hoá và triển khai lên Kubernetes thông qua các
+manifest YAML. Trong đề tài, việc quản lý và triển khai tài nguyên Kubernetes được
+thực hiện bằng Kustomize nhằm tổ chức cấu hình theo hướng rõ ràng, dễ mở rộng và
+thuận tiện cho việc thay đổi cấu hình giữa các môi trường.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.26]{chapter2/kustomization-structure.png}
+    \caption{Cấu trúc triển khai ứng dụng microservices sử dụng Kustomize}
+    \label{fig:chap2-kustomize-structure}
+\end{figure}
+
+Danh sách các file triển khai chính của ứng dụng bao gồm:
+\begin{itemize}
+    \item \texttt{deployments/config-server.yaml}
+    \item \texttt{deployments/discovery-server.yaml}
+    \item \texttt{deployments/api-gateway.yaml}
+    \item \texttt{deployments/admin-server.yaml}
+    \item \texttt{deployments/customers-service.yaml}
+    \item \texttt{deployments/visits-service.yaml}
+    \item \texttt{deployments/vets-service.yaml}
+\end{itemize}
+
+Bên cạnh các Deployment, hệ thống còn sử dụng các tài nguyên Service, Ingress,
+ConfigMap và Horizontal Pod Autoscaler (HPA) để hoàn thiện quá trình triển khai và
+vận hành ứng dụng. Việc tách riêng từng service thành các Deployment độc lập giúp
+hệ thống dễ dàng mở rộng, cập nhật từng thành phần và tăng khả năng chịu lỗi trong
+quá trình vận hành.
+
+Thông qua việc triển khai ứng dụng microservices này, đề tài xây dựng nền tảng
+ứng dụng phân tán hoàn chỉnh trên Kubernetes, làm cơ sở cho các nội dung đánh giá
+khả năng tự động mở rộng, chịu lỗi và giám sát hệ thống được trình bày trong các
+phần tiếp theo.
+
+\section{Kiểm thử và đánh giá hiệu năng hệ thống}
+\label{sec:chap2-performance-evaluation}
+
+\subsection{Kịch bản 1: Đánh giá khả năng mở rộng của hệ thống}
+\label{subsec:chap2-scenario1}
+
+Kịch bản này được thực hiện nhằm đánh giá khả năng mở rộng (scalability) và khả
+năng duy trì trạng thái ổn định của hệ thống microservices khi số lượng người dùng
+đồng thời tăng cao. Công cụ Locust được sử dụng để mô phỏng hành vi truy cập của
+người dùng, trong khi hệ thống giám sát Grafana thu thập và trực quan hoá các metric
+liên quan đến tài nguyên và cơ chế tự động mở rộng của Kubernetes.
+
+Mục tiêu của kịch bản kiểm thử bao gồm:
+\begin{itemize}
+    \item Đánh giá khả năng xử lý request đồng thời của hệ thống,
+    \item Quan sát mức sử dụng CPU và bộ nhớ khi tải tăng cao,
+    \item Phân tích hành vi của Horizontal Pod Autoscaler (HPA),
+    \item Kiểm tra khả năng duy trì dịch vụ ổn định trong điều kiện tải lớn.
+\end{itemize}
+
+\subsubsection*{(1) Trạng thái ban đầu của hệ thống}
+
+Trước khi bắt đầu tăng tải, hệ thống ở trạng thái hoạt động ổn định với số lượng
+người dùng thấp. Các service microservices đang chạy với số lượng Pod tối thiểu,
+chưa có hoạt động mở rộng từ HPA.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.4]{chapter2/47-TTbandau.png}
+    \caption{Trạng thái ban đầu của hệ thống trước khi thực hiện kiểm thử tải}
+    \label{fig:chap2-scenario1-initial-state}
+\end{figure}
+
+Các biểu đồ giám sát cho thấy mức sử dụng CPU và bộ nhớ của các node và service ở
+mức thấp và ổn định. Số lượng Pod mong muốn (Desired) và Pod sẵn sàng (Ready) là
+bằng nhau, phản ánh trạng thái vận hành bình thường của hệ thống.
+
+\subsubsection*{(2) Thiết lập và thực hiện tăng tải người dùng}
+
+Sau khi xác nhận trạng thái ban đầu, Locust được cấu hình để tăng dần số lượng
+người dùng đồng thời. Các request liên tục được gửi vào hệ thống thông qua API
+Gateway nhằm mô phỏng áp lực truy cập thực tế.
+
+Trong suốt quá trình kiểm thử, số lượng user được nâng lên mức cao và duy trì ổn
+định trong một khoảng thời gian nhằm tạo tải liên tục lên các service backend.
+Các chỉ số chính được theo dõi bao gồm RPS, thời gian phản hồi và mức sử dụng tài
+nguyên của hệ thống.
+
+\subsubsection*{(3) Phản ứng của hệ thống trong giai đoạn tăng tải}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.25]{chapter2/49-GiaiDoan1.png}
+    \caption{Hệ thống trong giai đoạn tăng tải người dùng}
+    \label{fig:chap2-scenario1-phase1}
+\end{figure}
+
+Hình~\ref{fig:chap2-scenario1-phase1} thể hiện giai đoạn số lượng người dùng tăng
+nhanh. Kết quả từ Locust cho thấy số lượng request trên giây (RPS) tăng mạnh và
+nhanh chóng đạt mức ổn định, trong khi tỷ lệ lỗi gần như bằng không.
+
+Ở phía giám sát hệ thống, mức sử dụng CPU và bộ nhớ của namespace ứng dụng tăng rõ
+rệt so với trạng thái ban đầu. Đặc biệt, các service như API Gateway và các service
+nghiệp vụ có mức tiêu thụ CPU tăng tương ứng với lưu lượng request, phản ánh đúng
+hành vi xử lý tải của hệ thống.
+
+\subsubsection*{(4) Hành vi HPA và trạng thái ổn định của hệ thống}
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.25]{chapter2/50-Giaidoan2.png}
+    \caption{Hành vi HPA và trạng thái hệ thống khi tải ổn định}
+    \label{fig:chap2-scenario1-phase2}
+\end{figure}
+
+Khi tải duy trì ở mức cao, Horizontal Pod Autoscaler bắt đầu kích hoạt cơ chế mở
+rộng. Quan sát biểu đồ Pods Desired vs Ready và HPA Desired vs Current Replicas cho
+thấy số lượng Pod được tăng lên phù hợp với mức tiêu thụ tài nguyên.
+
+Số lượng Pod sẵn sàng nhanh chóng tiệm cận với số lượng Pod mong muốn, chứng tỏ
+quá trình scale-out diễn ra hiệu quả và không gây gián đoạn dịch vụ. Đồng thời,
+thời gian phản hồi của hệ thống duy trì ở mức ổn định, không xuất hiện hiện tượng
+tăng đột biến dù số lượng người dùng đạt mức cao.
+
+\subsubsection*{(5) Nhận xét và đánh giá}
+
+Kết quả của kịch bản 1 cho thấy hệ thống microservices triển khai trên Kubernetes
+có khả năng mở rộng tốt khi chịu tải lớn. Cơ chế HPA hoạt động đúng chức năng, giúp
+tự động điều chỉnh số lượng Pod dựa trên mức tiêu thụ tài nguyên thực tế.
+
+Hệ thống duy trì được tính ổn định, không ghi nhận lỗi đáng kể trong suốt quá trình
+kiểm thử. Kịch bản này chứng minh khả năng xử lý tải đồng thời lớn của hệ thống và
+là nền tảng cho các kịch bản đánh giá nâng cao hơn về khả năng chịu lỗi và phục hồi
+trong các phần tiếp theo.
+
+
+\subsection{Kịch bản 2: Mô phỏng sự cố mất node trong điều kiện hệ thống đang chịu tải}
+\label{subsubsec:chap2-scenario2-node-failure}
+
+Kịch bản này được thực hiện nhằm đánh giá khả năng tự phục hồi (self-healing) của
+Kubernetes và khả năng duy trì dịch vụ liên tục (High Availability) của hệ thống
+microservices khi xảy ra sự cố hạ tầng. Trong kịch bản, một node worker trong cụm
+Amazon EKS bị chủ động loại bỏ trong khi hệ thống vẫn đang chịu tải từ người dùng
+đồng thời được sinh ra bởi công cụ Locust.
+
+\subsubsection*{(1) Trạng thái hệ thống trước khi xảy ra sự cố}
+
+Trước khi thực hiện sự cố, hệ thống đang hoạt động ổn định với số lượng người dùng
+đồng thời không đổi. Locust ghi nhận lưu lượng request ổn định, không xuất hiện
+lỗi trong quá trình xử lý request. Các chỉ số giám sát từ Grafana cho thấy mức sử
+dụng CPU và bộ nhớ được phân bổ đều giữa các node trong cluster.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.25]{chapter2/50-Giaidoan2.png}
+    \caption{Trạng thái sử dụng CPU và bộ nhớ của các node trước khi xảy ra sự cố}
+    \label{fig:chap2-scenario2-before-failure}
+\end{figure}
+
+Tại thời điểm này, các Pod của ứng dụng được phân bố đều trên nhiều node, cơ chế
+HPA duy trì số lượng replica ổn định, đảm bảo khả năng xử lý tải hiện tại.
+
+\subsubsection*{(2) Thực hiện sự cố mất node trong cụm EKS}
+
+Trong quá trình hệ thống đang chịu tải, một node worker được chủ động terminate
+trên AWS Console nhằm mô phỏng sự cố hạ tầng thực tế như mất node hoặc node gặp lỗi
+nghiêm trọng.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.28]{chapter2/55-Node-Failure.png}
+    \caption{Thực hiện terminate một node worker trong cụm Amazon EKS}
+    \label{fig:chap2-scenario2-node-termination}
+\end{figure}
+
+Ngay sau khi node bị terminate, Kubernetes phát hiện trạng thái node không còn sẵn
+sàng (NotReady) và tiến hành loại bỏ node này khỏi danh sách node khả dụng trong
+cluster.
+
+\subsubsection*{(3) Phản ứng của Kubernetes và hệ thống ứng dụng}
+
+Sau khi node bị loại bỏ, các Pod đang chạy trên node đó bị terminate theo. Kubernetes
+scheduler tự động khởi tạo lại các Pod bị mất và phân bố chúng sang các node còn
+lại trong cluster.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.3]{chapter2/56-Node-Failure.png}
+    \caption{Sự thay đổi phân bố tài nguyên và Pod sau khi node bị mất}
+    \label{fig:chap2-scenario2-after-failure}
+\end{figure}
+
+Các biểu đồ CPU và bộ nhớ theo từng node cho thấy tài nguyên trên các node còn lại
+tăng lên trong thời gian ngắn, phản ánh việc tiếp nhận thêm workload từ node bị
+mất. Tuy nhiên, các chỉ số này nhanh chóng ổn định trở lại sau khi hệ thống hoàn
+tất quá trình tái phân bổ Pod.
+
+\subsubsection*{(4) Quá trình phục hồi node và tái cân bằng hệ thống}
+
+Sau khi node worker bị terminate, cơ chế quản lý node của Amazon EKS tự động
+khởi tạo một node mới để thay thế nhằm đảm bảo số lượng node tối thiểu trong
+cluster. Node mới được đưa vào trạng thái \textit{Initializing}, sau đó chuyển
+sang trạng thái sẵn sàng (Ready) và tham gia lại vào cụm Kubernetes.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.34]{chapter2/58-Node_init.png}
+    \caption{Node mới được khởi tạo và tham gia lại vào cụm Amazon EKS}
+    \label{fig:chap2-scenario2-node-recovery}
+\end{figure}
+
+Khi node mới sẵn sàng, Kubernetes scheduler tiến hành tái phân bố các Pod trong
+cluster, giúp cân bằng lại tải giữa các node. Các biểu đồ giám sát cho thấy mức
+sử dụng CPU và bộ nhớ trên các node dần trở về trạng thái ổn định, phản ánh việc
+hệ thống đã hoàn tất quá trình phục hồi sau sự cố.
+
+Quá trình khởi tạo node mới và tái phân bố workload diễn ra hoàn toàn tự động,
+không yêu cầu can thiệp thủ công từ phía người vận hành. Điều này minh chứng cho
+khả năng tự phục hồi ở mức hạ tầng của hệ thống khi được triển khai trên nền tảng
+Kubernetes kết hợp với cơ chế quản lý tài nguyên của cloud provider.
+
+\subsubsection*{(5) Đánh giá ảnh hưởng tới người dùng và dịch vụ}
+
+Trong suốt quá trình xảy ra sự cố và phục hồi, Locust ghi nhận hệ thống vẫn duy trì
+lưu lượng request ổn định. Số lượng request trên giây (RPS) không bị gián đoạn,
+không xuất hiện lỗi HTTP từ phía ứng dụng.
+
+\begin{figure}[H]
+    \centering
+    \includegraphics[scale=0.18]{chapter2/KB3-Final.png}
+    \caption{Lưu lượng request và thời gian phản hồi của hệ thống trong khi mất node}
+    \label{fig:chap2-scenario2-locust-result}
+\end{figure}
+
+Thời gian phản hồi của hệ thống có tăng nhẹ tại thời điểm xảy ra sự cố do quá trình
+tái phân bổ tài nguyên, tuy nhiên vẫn nằm trong ngưỡng chấp nhận được và nhanh
+chóng trở lại trạng thái ổn định. Người dùng cuối không ghi nhận gián đoạn dịch vụ
+đáng kể.
+
+\subsubsection*{(6) Nhận xét và đánh giá}
+
+Kết quả của kịch bản cho thấy hệ thống microservices triển khai trên Kubernetes có
+khả năng tự phục hồi hiệu quả khi xảy ra sự cố mất node. Cơ chế scheduler và HPA
+hoạt động đúng chức năng, đảm bảo các Pod được khởi tạo lại và phân bố hợp lý trên
+các node còn lại.
+
+Việc triển khai ứng dụng theo kiến trúc microservices kết hợp với Kubernetes giúp
+hệ thống duy trì tính sẵn sàng cao (High Availability), hạn chế tối đa ảnh hưởng
+của sự cố hạ tầng đến trải nghiệm của người dùng cuối. Kịch bản này minh hoạ rõ
+vai trò của Kubernetes trong việc xây dựng các hệ thống phân tán có khả năng chịu
+lỗi và vận hành ổn định trong môi trường cloud.

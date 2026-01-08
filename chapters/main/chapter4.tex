@@ -1,17 +1,106 @@
-\chapter{Các vấn đề còn lại}
-\label{chap:chap4-summary}
+% \chapter{Các vấn đề còn lại}
+% \label{chap:chap4-summary}
 
-Trong chương này, tôi sẽ liên tục bổ sung thêm các kỹ thuật khác. Những câu hỏi ở repo cũng sẽ được giải đáp dần qua chương này. Tuy vậy, không phải tất cả các kỹ thuật khi được hỏi đều sẽ được giải đáp, các kỹ thuật cơ bản trong danh sách dưới đây sẽ không thuộc phạm vi hướng dẫn.
+% Trong chương này, tôi sẽ liên tục bổ sung thêm các kỹ thuật khác. Những câu hỏi ở repo cũng sẽ được giải đáp dần qua chương này. Tuy vậy, không phải tất cả các kỹ thuật khi được hỏi đều sẽ được giải đáp, các kỹ thuật cơ bản trong danh sách dưới đây sẽ không thuộc phạm vi hướng dẫn.
 
-\begin{itemize}
-    \item Kỹ thuật chèn tài liệu tham khảo
-\end{itemize}
+% \begin{itemize}
+%     \item Kỹ thuật chèn tài liệu tham khảo
+% \end{itemize}
 
-\section{Các câu hỏi về build project}
+% \section{Các câu hỏi về build project}
 
-Project được xây dựng trên nền tảng các gói cơ bản của Latex, người dùng có thể sử dụng miễn phí mà không cần mua bản quyền. Các hướng dẫn build project này được hướng dẫn tại README.
+% Project được xây dựng trên nền tảng các gói cơ bản của Latex, người dùng có thể sử dụng miễn phí mà không cần mua bản quyền. Các hướng dẫn build project này được hướng dẫn tại README.
 
-This is an example document to demonstrate the use of glossaries. 
-We mention \gls{ssl} and \gls{api} here.
+% This is an example document to demonstrate the use of glossaries. 
+% We mention \gls{ssl} and \gls{api} here.
 
-\lipsum[1]
+% \lipsum[1]
+
+\chapter{Kết luận và hướng phát triển}
+\label{chap:chap4-conclusion-future}
+
+Chương này tổng kết các kết quả chính mà đề tài đã đạt được sau quá trình thiết kế,
+triển khai và đánh giá hệ thống, đồng thời đề xuất các hướng phát triển nhằm hoàn
+thiện và mở rộng hệ thống trong tương lai. Nội dung chương được xây dựng dựa trên
+toàn bộ kết quả thực nghiệm và các hạn chế đã được phân tích trong Chương~3.
+
+\section{Kết luận}
+\label{sec:chap4-conclusion}
+
+Trong phạm vi đề tài, nhóm đã thiết kế và triển khai thành công một hệ thống
+Kubernetes cho ứng dụng microservices trên nền tảng điện toán đám mây Amazon Web
+Services. Hệ thống được xây dựng theo kiến trúc cloud-native, tuân thủ các nguyên
+tắc của hệ thống phân tán hiện đại, bao gồm phân tách môi trường, khả năng mở rộng,
+tính sẵn sàng cao và khả năng chịu lỗi.
+
+Hạ tầng hệ thống được hiện thực hoá hoàn toàn theo mô hình \textit{Infrastructure
+as Code} thông qua Terraform, kết hợp với Ansible để tự động hoá cấu hình các thành
+phần vận hành và giám sát. Cách tiếp cận này giúp đảm bảo tính nhất quán giữa các
+môi trường, giảm thiểu sai sót cấu hình và nâng cao khả năng tái triển khai hệ thống.
+
+Ứng dụng microservices được triển khai thành công trên Kubernetes với đầy đủ các
+thành phần quản lý cấu hình, khám phá dịch vụ và điều phối truy cập. Thông qua các
+kịch bản kiểm thử tải và mô phỏng sự cố, hệ thống đã thể hiện khả năng mở rộng tự
+động thông qua Horizontal Pod Autoscaler và khả năng tự phục hồi hiệu quả khi xảy
+ra sự cố mất node trong cụm Kubernetes.
+
+Bên cạnh đó, đề tài đã xây dựng được một hệ thống quan sát ở mức cơ bản, bao gồm
+giám sát metric và ghi log tập trung. Việc kết hợp Prometheus, Grafana, Loki và
+Promtail cho phép theo dõi trạng thái vận hành của hệ thống ở cả mức hạ tầng và
+mức Kubernetes, hỗ trợ quá trình phân tích, đánh giá và minh hoạ hành vi của hệ
+thống phân tán trong các kịch bản thử nghiệm.
+
+Nhìn chung, đề tài đã hoàn thành các mục tiêu đề ra ban đầu, minh hoạ rõ vai trò
+của Kubernetes và các công cụ cloud-native trong việc xây dựng, vận hành và giám
+sát các hệ thống microservices có tính sẵn sàng cao trên nền tảng cloud.
+
+\section{Hướng phát triển}
+\label{sec:chap4-future-work}
+
+Mặc dù đã đạt được các kết quả quan trọng, hệ thống hiện tại vẫn còn nhiều tiềm
+năng để mở rộng và hoàn thiện hơn trong tương lai. Một số hướng phát triển tiêu
+biểu có thể được xem xét như sau.
+
+\subsection{Tích hợp CI/CD và GitOps cho triển khai ứng dụng}
+
+Trong các giai đoạn tiếp theo, hệ thống có thể được mở rộng bằng cách tích hợp
+pipeline CI/CD nhằm tự động hoá toàn bộ quy trình build, test và triển khai ứng
+dụng lên Kubernetes. Việc áp dụng CI/CD giúp giảm thiểu thao tác thủ công, tăng độ
+tin cậy trong quá trình triển khai và rút ngắn thời gian đưa phiên bản mới vào
+vận hành.
+
+Bên cạnh đó, mô hình GitOps có thể được áp dụng để quản lý cấu hình Kubernetes
+thông qua repository Git, cho phép kiểm soát phiên bản, truy vết thay đổi và tự
+động đồng bộ trạng thái hệ thống với cấu hình mong muốn.
+
+\subsection{Hoàn thiện hệ thống Observability theo hướng nâng cao}
+
+Hệ thống quan sát có thể được mở rộng theo hướng đầy đủ hơn bằng cách tích hợp
+distributed tracing nhằm theo dõi luồng request xuyên suốt các service trong
+kiến trúc microservices. Việc kết hợp tracing với metric và log sẽ giúp nâng cao
+khả năng phân tích nguyên nhân gốc rễ khi xảy ra sự cố.
+
+Ngoài ra, hệ thống cảnh báo tự động dựa trên các chỉ số SLO hoặc SLA có thể được
+triển khai nhằm phát hiện sớm các bất thường và hỗ trợ phản ứng kịp thời khi hệ
+thống có dấu hiệu suy giảm hiệu năng.
+
+\subsection{Mở rộng các kịch bản đánh giá High Availability và Fault Tolerance}
+
+Trong tương lai, các kịch bản đánh giá có thể được mở rộng để kiểm tra khả năng
+chịu lỗi của hệ thống trong những tình huống phức tạp hơn, chẳng hạn như sự cố
+mất toàn bộ một Availability Zone hoặc các lỗi mạng cục bộ.
+
+Bên cạnh đó, việc áp dụng các kỹ thuật Chaos Engineering sẽ giúp chủ động kiểm
+tra và đánh giá mức độ ổn định của hệ thống trong điều kiện lỗi, từ đó nâng cao
+độ tin cậy và khả năng sẵn sàng của hệ thống trong môi trường vận hành thực tế.
+
+\subsection{Nâng cấp hệ thống theo hướng production-ready}
+
+Hệ thống có thể được hoàn thiện hơn để đáp ứng các yêu cầu của môi trường sản
+xuất thực tế, bao gồm triển khai HTTPS với quản lý chứng chỉ TLS tự động, tích
+hợp Web Application Firewall (WAF) và xây dựng các chính sách bảo mật lớp ứng
+dụng.
+
+Ngoài ra, việc đánh giá chi phí vận hành, tối ưu tài nguyên và triển khai các
+cơ chế autoscaling nâng cao sẽ giúp hệ thống sẵn sàng hơn cho các bài toán
+triển khai thực tế trong doanh nghiệp.
