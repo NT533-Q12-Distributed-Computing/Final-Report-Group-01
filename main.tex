@@ -35,7 +35,7 @@ NGUYỄN TÀI PHÚ -- 23521185
 % Glossary
 % =========================
 \input{chapters/front/glossaries.tex}
-\makeglossaries
+\makenoidxglossaries
 
 % =========================
 % Document
@@ -47,7 +47,7 @@ NGUYỄN TÀI PHÚ -- 23521185
 % ---------- FRONT MATTER ----------
 \frontmatter
 \include{chapters/front/thanks.tex}
-\include{chapters/front/summary.tex}
+\include{chapters/main/summary.tex}
 
 
 \tableofcontents
@@ -56,7 +56,8 @@ NGUYỄN TÀI PHÚ -- 23521185
 \listoffigures
 \clearpage
 
-\printglossaries
+\glsaddall
+\printnoidxglossaries
 \clearpage
 
 
@@ -73,6 +74,7 @@ NGUYỄN TÀI PHÚ -- 23521185
 \include{chapters/back/apendixA.tex}
 
 % ---------- REFERENCES ----------
+\nocite{*}
 \printbibliography[heading=bibintoc, title={Tài liệu tham khảo}]
 
 \end{document}
