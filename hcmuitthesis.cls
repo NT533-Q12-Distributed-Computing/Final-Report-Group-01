@@ -5,50 +5,44 @@
 \ProcessOptions\relax
 \LoadClass[14pt,a4paper]{memoir}
 % ========== Require package to setup paper, link, language
-\RequirePackage{anyfontsize,mathptmx}
+\RequirePackage[utf8]{inputenc}
 \RequirePackage[T5]{fontenc}
+\RequirePackage{anyfontsize,mathptmx}
 \RequirePackage{geometry,graphicx,indentfirst,setspace}
 \RequirePackage{tikz}
 \RequirePackage[center]{caption}
-\RequirePackage{fancyhdr,hyperref}
+\PassOptionsToPackage{bookmarks=false}{hyperref}
+\RequirePackage{hyperref}
 \RequirePackage[vietnamese,english]{babel}
 \RequirePackage[utf8]{vietnam}
 \RequirePackage{listings}
-\RequirePackage{graphicx}
-\RequirePackage{glossaries}
-\RequirePackage[fontsize=13pt]{scrextend}
+\PassOptionsToPackage{nowarn}{tracklang}
+\RequirePackage[nolangwarn,noredefwarn]{glossaries}
 \RequirePackage{placeins}
-\RequirePackage{amsfonts}
+\RequirePackage{amsfonts,amssymb,amsmath,mathtools}
 \RequirePackage{textcomp}
-\RequirePackage{dblfloatfix}
 \RequirePackage{lineno}
-\RequirePackage{amssymb}
-\RequirePackage{tabularx,booktabs}
-\RequirePackage{longtable}
-\RequirePackage{amsmath}
-\RequirePackage{mathtools}
-\RequirePackage{graphicx}
+\RequirePackage{tabularx,booktabs,longtable}
 \RequirePackage{lscape}
-\RequirePackage{caption}
-\RequirePackage{hyperref}
-\RequirePackage[sorting=nyt]{biblatex}
-\RequirePackage{mathtools}
-\RequirePackage{lipsum,blindtext}
-\RequirePackage{fancyhdr}
-\RequirePackage{titlesec}
+\RequirePackage[autopunct=false]{csquotes}
+\RequirePackage[sorting=nyt,language=english]{biblatex}
+\DeclareLanguageMapping{vietnamese}{english}
 \RequirePackage{makecell}
-\RequirePackage{listings}
 \RequirePackage{subcaption}
 \RequirePackage{float}
 \RequirePackage{adjustbox}
 \RequirePackage{multirow}
-\RequirePackage{longtable}
 \RequirePackage{rotating}
-\RequirePackage[utf8]{inputenc}
 \usetikzlibrary{calc}
 
 % Define color and column type
-\hypersetup{urlcolor=blue,linkcolor=black,citecolor=black,colorlinks=true} 
+\hypersetup{
+  colorlinks=true,
+  linkcolor=black,
+  citecolor=blue,
+  urlcolor=blue,
+  hypertexnames=false
+}
 \definecolor{dkgreen}{rgb}{0,0.6,0}
 \definecolor{gray}{rgb}{0.5,0.5,0.5}
 \definecolor{mauve}{rgb}{0.58,0,0.82}
@@ -56,10 +50,9 @@
 % Config figure path
 \graphicspath{ {./graphics} }
 
-% Define the desired distance from the top of the page
-\newlength{\chaptertopmargin}
-\setlength{\chaptertopmargin}{2cm} % Adjust the value as needed
-\titlespacing*{\chapter}{0pt}{\chaptertopmargin}{20pt} % Adjust the second value for space before chapter titles
+% Chapter title spacing (memoir-native)
+\setlength{\beforechapskip}{2cm}
+\setlength{\afterchapskip}{20pt}
 
 
 % Config for math in quantum computin
@@ -118,8 +111,6 @@
 
 % =========== Overwrite exist command to custom project ============
 \renewcommand{\@title}{}
-\renewcommand{\headrulewidth}{0.3pt}
-\renewcommand{\footrulewidth}{0pt}
 \renewcommand{\large}{\fontsize{15}{15}\selectfont}
 \renewcommand{\Large}{\fontsize{20}{20}\selectfont}
 \renewcommand{\arraystretch}{1.2}
@@ -143,37 +134,30 @@
 }
 \OnehalfSpacing
 \raggedbottom
+\setlength{\emergencystretch}{2em}
 
-% Set depth of numbering for sections and table of contents
-\setsecnumdepth{subsection}
-\settocdepth{subsection}
-
-% ===== Enable numbering for subsubsection (1.1.1.1) =====
+% Numbering depth for sections and table of contents
 \setsecnumdepth{subsubsection}
 \settocdepth{subsubsection}
 
-% ===== Optional: Keep memoir default style, only add numbering =====
-\titleformat{\subsubsection}
-  {\normalfont\normalsize\bfseries}
-  {\thesubsubsection}{0.8em}{}
+% Subsubsection heading style (memoir-native)
+\setsubsubsecheadstyle{\normalfont\normalsize\bfseries}
 
 
 % Set numwidths
 \setlength{\cfttablenumwidth}{3em}
 \setlength{\cftfigurenumwidth}{3em}
-\AtBeginDocument{\renewcommand*\bibname{References}}
 
-% ==========Setup corlor for link and url==========
-\hypersetup{
-  colorlinks=true,
-  linkcolor=black,
-  citecolor=blue,
-  urlcolor=blue
-}
-
-% ========== Start create cover page, fancy is package to draw line, paper..==========
-\pagestyle{fancy}
-\fancyhf{}
+% ========== Page style ==========
+\makepagestyle{thesis}
+\makeheadrule{thesis}{\textwidth}{0.3pt}
+\makeevenhead{thesis}{\bfseries\rightmark}{}{}
+\makeoddhead{thesis}{}{}{\bfseries\rightmark}
+\makeevenfoot{thesis}{}{\thepage}{}
+\makeoddfoot{thesis}{}{\thepage}{}
+\nouppercaseheads
+\aliaspagestyle{chapter}{thesis}
+\pagestyle{thesis}
 
 % first cover page
 \def\coverpage{
@@ -215,7 +199,7 @@
   \end{center}
   \normalsize
   \cleardoublepage
-  \pagestyle{fancy}
+  \pagestyle{thesis}
 }
 
 %Second Cover page
@@ -261,7 +245,7 @@
   \end{center}
   \normalsize
   \cleardoublepage
-  \pagestyle{fancy}
+  \pagestyle{thesis}
 }
 
 \def\mainthesis {
@@ -270,13 +254,5 @@
   \counterwithin{figure}{chapter}
   \setcounter{secnumdepth}{3}
   \mainmatter
-  % Config page header
-  \fancyhf{}
-  \fancyfoot[C]{\thepage}
-  \include{chapters/main/summary.tex}
-  \if @twoside
-    \fancyhead[EL,OR]{\bfseries\nouppercase\rightmark}
-  \else
-    \fancyhead[R]{\bfseries\nouppercase\rightmark}
-  \fi
+  \pagestyle{thesis}
 }
